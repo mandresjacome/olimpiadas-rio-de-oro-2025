@@ -28,21 +28,12 @@
             <a href="control-panel.html" class="nav-btn">
                 ⚙️ Panel de Control
             </a>
-            <a href="admin-results.html" class="nav-btn" style="background: #FF9800; display: none;">
-                🔧 Administrar Resultados
+            <a href="settings.html" class="nav-btn" style="background: #FF9800;">
+                🔧 Configuración
             </a>
             <a href="public-view.html" class="nav-btn success">
                 📊 Resultados Públicos
             </a>
-            <button onclick="DataExporter.exportJSON()" class="nav-btn secondary" style="display: none;">
-                💾 Backup
-            </button>
-            <button onclick="showImportModal()" class="nav-btn secondary" style="display: none;">
-                📥 Importar
-            </button>
-            <button onclick="limpiarEventosDuplicados()" class="nav-btn" style="background: #FF9800; color: white; display: none;">
-                🧹 Limpiar Duplicados
-            </button>
         </div>
 
         <!-- Panel de Ayuda e Instrucciones (Desplegable) -->
@@ -160,12 +151,6 @@
                 <div style="background: #FFEBEE; padding: 15px; border-radius: 8px; margin-top: 15px; border: 2px solid #F44336;">
                     <h3 style="color: #C62828; margin-top: 0;">⚠️ Importante</h3>
                     <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
-                        <li>El botón <strong>🗑️ Eliminar</strong> borra permanentemente. ¡Ten cuidado!</li>
-                        <li>Puedes buscar sin tildes: "nicolas" encontrará "Nicolás"</li>
-                        <li>Si hay más de 10 registros, usa el botón <strong>"📋 Ver todos"</strong></li>
-                    </ul>
-                </div>
-            </div>
         </div>
 
         <!-- Categories Section -->

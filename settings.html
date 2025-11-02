@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración y Mantenimiento - Sistema de Natación</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(156,39,176,0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 6px 25px rgba(255,64,129,0.6); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>⚙️ Configuración y Mantenimiento</h1>
+        <p>Configuración inicial del sistema y gestión de datos</p>
+    </div>
+
+    <div class="container">
+        <!-- Navigation Menu -->
+        <div class="nav-menu">
+            <a href="index.html" class="nav-btn">
+                📋 Dashboard
+            </a>
+            <a href="control-panel.html" class="nav-btn">
+                ⚙️ Panel de Control
+            </a>
+            <a href="public-view.html" class="nav-btn success">
+                📊 Resultados Públicos
+            </a>
+        </div>
+
+        <!-- Panel de Configuración -->
+        <div class="card" style="background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%); border-left: 5px solid #4CAF50;">
+            <div class="card-header" style="background: transparent; border-bottom: 2px solid #4CAF50;">
+                <h2 style="color: #2E7D32;">💡 Guía de Configuración del Evento</h2>
+            </div>
+            <div style="padding: 20px;">
+                <p style="font-size: 1.1em; margin-bottom: 20px; color: #1B5E20;">
+                    <strong>Bienvenido al Panel de Configuración</strong> - Aquí puedes preparar todo para las Olimpiadas Río de Oro 2025
+                </p>
+
+                <!-- Botones de Acción Rápida -->
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 3px solid #4CAF50;">
+                    <h3 style="color: #2E7D32; margin-top: 0; text-align: center;">🚀 Acciones Rápidas</h3>
+                    <div style="display: grid; gap: 15px;">
+                        <!-- Configurar Todo -->
+                        <div style="background: linear-gradient(135deg, #F3E5F5, #E1BEE7); padding: 15px; border-radius: 8px; border-left: 5px solid #9C27B0;">
+                            <button onclick="configurarEventoCompleto()" style="width: 100%; background: linear-gradient(135deg, #FF4081, #9C27B0); color: white; font-weight: bold; font-size: 1.1em; padding: 15px 25px; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(156,39,176,0.4); animation: pulse 2s infinite; margin-bottom: 10px;">
+                                ⚡ CONFIGURAR TODO AUTOMÁTICAMENTE ⚡
+                            </button>
+                            <p style="margin: 5px 0; line-height: 1.6; color: #4A148C;">
+                                <strong>¿Primera vez?</strong> Este botón crea automáticamente:
+                            </p>
+                            <ul style="margin: 5px 0; padding-left: 20px; line-height: 1.6; color: #6A1B9A;">
+                                <li>9 categorías estándar (Pre-Infantil A, B, Infantil A, B, Juvenil A, B, C, Mayores, Máster)</li>
+                                <li>27 eventos/pruebas de natación (50m, 100m, 200m en todos los estilos)</li>
+                            </ul>
+                            <p style="margin: 5px 0; color: #D32F2F; font-weight: bold;">⚠️ Solo úsalo una vez al inicio!</p>
+                        </div>
+
+                        <!-- Generar Datos -->
+                        <div style="background: linear-gradient(135deg, #F3E5F5, #E1BEE7); padding: 15px; border-radius: 8px; border-left: 5px solid #9C27B0;">
+                            <button onclick="generateTestData()" style="width: 100%; background: #9C27B0; color: white; font-weight: bold; font-size: 1.05em; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 3px 10px rgba(156,39,176,0.3); margin-bottom: 10px;">
+                                🎲 Generar Datos Completos
+                            </button>
+                            <p style="margin: 5px 0; line-height: 1.6; color: #4A148C;">
+                                <strong>Para pruebas:</strong> Genera datos de ejemplo completos incluyendo:
+                            </p>
+                            <ul style="margin: 5px 0; padding-left: 20px; line-height: 1.6; color: #6A1B9A;">
+                                <li>96 participantes de muestra con nombres realistas</li>
+                                <li>Inscripciones automáticas en las pruebas</li>
+                                <li>Resultados simulados para hacer pruebas</li>
+                            </ul>
+                            <p style="margin: 5px 0; color: #FF6F00; font-weight: bold;">💡 Útil para probar el sistema antes del evento real</p>
+                        </div>
+
+                        <!-- Limpiar Todo -->
+                        <div style="background: linear-gradient(135deg, #FFEBEE, #FFCDD2); padding: 15px; border-radius: 8px; border-left: 5px solid #D32F2F;">
+                            <button onclick="clearAllData()" style="width: 100%; background: #D32F2F; color: white; font-weight: bold; font-size: 1.05em; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 3px 10px rgba(211,47,47,0.3); margin-bottom: 10px;">
+                                🗑️ Limpiar Todo
+                            </button>
+                            <p style="margin: 5px 0; line-height: 1.6; color: #B71C1C;">
+                                <strong>¡PELIGRO!</strong> Elimina TODA la información:
+                            </p>
+                            <ul style="margin: 5px 0; padding-left: 20px; line-height: 1.6; color: #C62828;">
+                                <li>Todas las categorías</li>
+                                <li>Todos los eventos/pruebas</li>
+                                <li>Todos los participantes</li>
+                                <li>Todas las inscripciones y resultados</li>
+                            </ul>
+                            <p style="margin: 5px 0; color: #D32F2F; font-weight: bold;">⚠️ ESTA ACCIÓN NO SE PUEDE DESHACER - Úsalo solo si quieres empezar de cero</p>
+                        </div>
+
+                        <!-- Backup/Restore -->
+                        <div style="background: linear-gradient(135deg, #E3F2FD, #BBDEFB); padding: 15px; border-radius: 8px; border-left: 5px solid #2196F3;">
+                            <h4 style="margin: 0 0 10px 0; color: #1976D2;">💾 Backup y Restauración</h4>
+                            <div style="display: grid; gap: 10px;">
+                                <button onclick="DataExporter.exportJSON()" class="btn" style="background: #2196F3; color: white;">
+                                    📥 Exportar Backup (JSON)
+                                </button>
+                                <button onclick="showImportModal()" class="btn" style="background: #1976D2; color: white;">
+                                    📤 Importar Backup
+                                </button>
+                            </div>
+                            <p style="margin: 10px 0 0 0; line-height: 1.6; color: #0D47A1; font-size: 0.9em;">
+                                <strong>Tip:</strong> Haz backups regulares para no perder información importante
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Guía de Uso -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+                    <!-- Categorías -->
+                    <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #2196F3;">
+                        <h3 style="color: #1976D2; margin-top: 0;">📋 1. Categorías</h3>
+                        <p style="margin: 10px 0; line-height: 1.6;">Define los grupos de edad de los nadadores (Ej: Sub-10, Sub-12, Juvenil, etc.)</p>
+                        <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
+                            <li><strong>➕ Agregar Categoría:</strong> Crea una nueva categoría</li>
+                            <li><strong>✏️ Editar:</strong> Modifica el nombre de una categoría</li>
+                            <li><strong>🗑️ Eliminar:</strong> Borra una categoría (cuidado!)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Pruebas -->
+                    <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #FF9800;">
+                        <h3 style="color: #F57C00; margin-top: 0;">🏁 2. Eventos/Pruebas</h3>
+                        <p style="margin: 10px 0; line-height: 1.6;">Configura las competencias (Ej: 50m Libre, 100m Espalda, Relevo 4x50, etc.)</p>
+                        <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
+                            <li><strong>➕ Agregar Evento:</strong> Crea una nueva prueba y asígnala a una categoría</li>
+                            <li><strong>🔍 Buscar:</strong> Filtra pruebas por nombre</li>
+                            <li><strong>✏️ Editar:</strong> Cambia el nombre o categoría</li>
+                        </ul>
+                    </div>
+
+                    <!-- Participantes -->
+                    <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #9C27B0;">
+                        <h3 style="color: #7B1FA2; margin-top: 0;">👤 3. Participantes</h3>
+                        <p style="margin: 10px 0; line-height: 1.6;">Registra todos los nadadores que competirán (nombre, club, género)</p>
+                        <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
+                            <li><strong>➕ Agregar Participante:</strong> Registra un nuevo nadador</li>
+                            <li><strong>🔍 Buscar:</strong> Encuentra por nombre o club</li>
+                            <li><strong>✏️ Editar:</strong> Actualiza datos del nadador</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Notas Importantes -->
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-top: 20px; border: 2px solid #FFC107;">
+                    <h3 style="color: #F57F17; margin-top: 0;">⚡ Consejos Importantes</h3>
+                    <ul style="line-height: 2;">
+                        <li>✅ <strong>Primero</strong> crea las categorías</li>
+                        <li>✅ <strong>Luego</strong> crea los eventos/pruebas para cada categoría</li>
+                        <li>✅ <strong>Después</strong> registra los participantes</li>
+                        <li>✅ Finalmente usa el <strong>Panel de Control</strong> para inscribir nadadores y registrar tiempos</li>
+                        <li>⚠️ Haz <strong>backups regularmente</strong> - Los datos se guardan en el navegador!</li>
+                        <li>💡 Usa "Generar Datos Completos" solo para <strong>probar el sistema</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: linear-gradient(135deg, #2E7D32, #1B5E20); color: white; padding: 30px 20px; margin-top: 40px; text-align: center;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <h3 style="margin: 0 0 10px 0; font-size: 1.5em;">🏊 Olimpiadas Río de Oro 2025</h3>
+            <p style="margin: 5px 0; opacity: 0.9;">Sistema de Gestión de Competencias de Natación</p>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.3);">
+                <p style="margin: 0; font-size: 0.85em; opacity: 0.7;">Desarrollado con ❤️ para la comunidad deportiva</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/database.js"></script>
+    <script src="js/event-data.js"></script>
+    <script src="js/sportland-participants-importer.js"></script>
+    <script src="js/setup-complete-event.js"></script>
+    <script src="js/data-exporter.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
