@@ -1,0 +1,13 @@
+# Archivos de credenciales de Google
+*.json
+gen-lang-client-*.json
+
+# Node modules
+node_modules/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

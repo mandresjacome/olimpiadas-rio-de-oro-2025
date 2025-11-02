@@ -447,6 +447,9 @@
             overflow-y: auto;
         }
     </style>
+    
+    <!-- jsPDF para generar PDFs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
     <div class="header">
@@ -653,6 +656,9 @@
                 <div class="results-header">
                     <h2>📊 Todos los Resultados</h2>
                     <div>
+                        <button onclick="generarPDFPorEvento()" class="btn btn-success" style="margin-right: 10px;">
+                            📄 Generar PDF
+                        </button>
                         <button onclick="loadAllResultsAdmin()" class="btn btn-primary">
                             🔄 Recargar
                         </button>
@@ -2440,6 +2446,40 @@
             </div>
         </div>
     </footer>
+    
+    <!-- Google Drive Uploader -->
+    <script src="js/google-drive-uploader.js"></script>
+    
+    <script>
+        /**
+         * Generar PDF por evento seleccionado
+         */
+        function generarPDFPorEvento() {
+            // Obtener evento y categoría actuales
+            const eventSelect = document.getElementById('eventFilter');
+            const eventId = eventSelect?.value;
+            
+            if (!eventId) {
+                alert('⚠️ Por favor selecciona un evento primero');
+                return;
+            }
+            
+            // Obtener información del evento
+            const event = db.getEventById(eventId);
+            if (!event) {
+                alert('❌ Evento no encontrado');
+                return;
+            }
+            
+            // Obtener categoría
+            const category = db.getCategoryById(event.category_id);
+            const categoryName = category?.category_name || 'Categoría Desconocida';
+            const eventName = event.event_name;
+            
+            // Generar PDF
+            generarYSubirPDFResultados(eventId, eventName, categoryName);
+        }
+    </script>
     
 </body>
 </html>
