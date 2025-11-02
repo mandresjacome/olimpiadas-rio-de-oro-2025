@@ -2401,13 +2401,45 @@
                 }
                 
                 editingResultIdAdmin = null;
+                
+                // Guardar filtros actuales
+                const currentCategoryFilter = document.getElementById('filterCategoryResults').value;
+                const currentEventFilter = document.getElementById('filterEventResults').value;
+                
+                // Recargar datos
                 loadAllResultsAdmin();
+                
+                // Restaurar filtros
+                document.getElementById('filterCategoryResults').value = currentCategoryFilter;
+                if (currentCategoryFilter) {
+                    updateEventFilterResults();
+                }
+                document.getElementById('filterEventResults').value = currentEventFilter;
+                if (currentEventFilter) {
+                    filterByEventResults();
+                }
             }
         }
         
         function cancelEditAdmin(entryId) {
             editingResultIdAdmin = null;
+            
+            // Guardar filtros actuales
+            const currentCategoryFilter = document.getElementById('filterCategoryResults').value;
+            const currentEventFilter = document.getElementById('filterEventResults').value;
+            
+            // Recargar datos
             loadAllResultsAdmin();
+            
+            // Restaurar filtros
+            document.getElementById('filterCategoryResults').value = currentCategoryFilter;
+            if (currentCategoryFilter) {
+                updateEventFilterResults();
+            }
+            document.getElementById('filterEventResults').value = currentEventFilter;
+            if (currentEventFilter) {
+                filterByEventResults();
+            }
         }
         
         function deleteResultAdmin(entryId) {
@@ -2415,8 +2447,24 @@
                 return;
             }
             
+            // Guardar filtros actuales
+            const currentCategoryFilter = document.getElementById('filterCategoryResults').value;
+            const currentEventFilter = document.getElementById('filterEventResults').value;
+            
             db.deleteEntry(entryId);
+            
+            // Recargar datos
             loadAllResultsAdmin();
+            
+            // Restaurar filtros
+            document.getElementById('filterCategoryResults').value = currentCategoryFilter;
+            if (currentCategoryFilter) {
+                updateEventFilterResults();
+            }
+            document.getElementById('filterEventResults').value = currentEventFilter;
+            if (currentEventFilter) {
+                filterByEventResults();
+            }
         }
         
         function updateStatisticsAdmin() {
