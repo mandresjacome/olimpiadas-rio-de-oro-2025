@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados en Vivo - Competencia de Natación</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>🏆 Resultados en Vivo</h1>
+        <p>Competencia de Natación - Actualización en Tiempo Real</p>
+    </div>
+
+    <div class="container">
+        <!-- Navigation -->
+        <div class="nav-menu">
+            <a href="event-info.html" class="nav-btn" style="background: #2E7D32;">
+                ℹ️ Info del Evento
+            </a>
+            <button onclick="refreshData()" class="btn btn-primary">
+                🔄 Actualizar
+            </button>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-section">
+            <h3 style="margin-bottom: 15px;">🔍 Filtrar Resultados</h3>
+            <div class="filter-row">
+                <div class="form-group">
+                    <label>Categoría:</label>
+                    <select id="filterCategory" onchange="updateEventFilter()">
+                        <option value="">-- Todas las categorías --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Prueba:</label>
+                    <select id="filterEvent" onchange="filterByEvent()">
+                        <option value="">-- Todas las pruebas --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Estado:</label>
+                    <select id="statusFilter" onchange="applyFilters()">
+                        <option value="">Todos</option>
+                        <option value="OK">OK</option>
+                        <option value="DQ">DQ</option>
+                        <option value="DNS">DNS</option>
+                        <option value="DNF">DNF</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Buscar Participante:</label>
+                    <input type="text" id="searchFilter" placeholder="Nombre del nadador..." oninput="applyFilters()">
+                </div>
+            </div>
+        </div>
+
+        <!-- Podiums Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2>🏆 Podios por Evento</h2>
+                <button onclick="togglePodiums()" class="btn btn-secondary btn-sm" id="podiumToggle">
+                    👁️ Mostrar Todos
+                </button>
+            </div>
+            <div id="podiumsContainer" class="podium-container">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="card">
+            <div class="card-header">
+                <h2>📊 Tabla de Resultados Completa</h2>
+                <div class="card-actions">
+                    <button onclick="DataExporter.exportResultsCSV()" class="btn btn-success btn-sm">
+                        📥 Exportar CSV
+                    </button>
+                </div>
+            </div>
+            <div class="results-table-wrapper">
+                <div id="noResults" class="empty-state" style="display: none;">
+                    <div class="empty-state-icon">📊</div>
+                    <h3>No hay resultados aún</h3>
+                    <p>Los resultados aparecerán aquí cuando se guarden en el panel de control</p>
+                </div>
+                <table id="resultsTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px; text-align: center;">Pos</th>
+                            <th>Evento</th>
+                            <th>Categoría</th>
+                            <th>Participante</th>
+                            <th>Club</th>
+                            <th style="width: 80px; text-align: center;">Serie</th>
+                            <th style="width: 80px; text-align: center;">Carril</th>
+                            <th style="width: 120px; text-align: center;">Tiempo</th>
+                            <th style="width: 100px; text-align: center;">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="card">
+            <div class="card-header">
+                <h2>📈 Estadísticas Generales</h2>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                <div style="background: #E3F2FD; padding: 20px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 2em; font-weight: bold; color: #2E7D32;" id="statTotalResults">0</div>
+                    <div style="color: #666;">Resultados Registrados</div>
+                </div>
+                <div style="background: #E8F5E9; padding: 20px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 2em; font-weight: bold; color: #388E3C;" id="statOK">0</div>
+                    <div style="color: #666;">Tiempos Válidos (OK)</div>
+                </div>
+                <div style="background: #FFEBEE; padding: 20px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 2em; font-weight: bold; color: #D32F2F;" id="statDQ">0</div>
+                    <div style="color: #666;">Descalificados (DQ)</div>
+                </div>
+                <div style="background: #FFF3E0; padding: 20px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 2em; font-weight: bold; color: #F57C00;" id="statEvents">0</div>
+                    <div style="color: #666;">Eventos con Resultados</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/database.js"></script>
+    <script src="js/export.js"></script>
+    <script>
+        let allResults = [];
+        let filteredResults = [];
+        let showAllPodiums = false;
+
+        // Función para normalizar texto (sin tildes, minúsculas)
+        function normalizarTexto(texto) {
+            return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+        });
+
+        // Load all data
+        function loadData() {
+            loadFilters();
+            loadResults();
+            updateStatistics();
+        }
+
+        // Refresh data
+        function refreshData() {
+            loadData();
+            updateLastUpdateTime();
+            showTemporaryMessage('✅ Datos actualizados');
+        }
+
+        // Load filters
+        function loadFilters() {
+            // Load categories
+            const categories = db.getCategories();
+            const filterCategory = document.getElementById('filterCategory');
+            const currentCategoryValue = filterCategory.value;
+            filterCategory.innerHTML = '<option value="">-- Todas las categorías --</option>';
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.category_id;
+                option.textContent = cat.category_name;
+                filterCategory.appendChild(option);
+            });
+            filterCategory.value = currentCategoryValue;
+            
+            // Update events based on selected category
+            if (currentCategoryValue) {
+                updateEventFilter();
+            }
+        }
+        
+        // Update event filter based on selected category
+        function updateEventFilter() {
+            const categoryId = document.getElementById('filterCategory').value;
+            const filterEvent = document.getElementById('filterEvent');
+            const currentEventValue = filterEvent.value;
+            filterEvent.innerHTML = '<option value="">-- Todas las pruebas --</option>';
+            
+            if (categoryId) {
+                const events = db.getEventsByCategory(categoryId);
+                events.forEach(evt => {
+                    const option = document.createElement('option');
+                    option.value = evt.event_id;
+                    option.textContent = evt.event_name;
+                    filterEvent.appendChild(option);
+                });
+                filterEvent.value = currentEventValue;
+            }
+            
+            filterByEvent();
+        }
+        
+        // Filter by selected event
+        function filterByEvent() {
+            applyFilters();
+        }
+
+        // Load results
+        function loadResults() {
+            const entries = db.getAllEntries();
+            allResults = [];
+
+            entries.forEach(entry => {
+                const participant = db.getParticipantById(entry.participant_id);
+                const event = db.getEventById(entry.event_id);
+                const category = event ? db.getCategoryById(event.category_id) : null;
+
+                if (participant && event && category) {
+                    // Obtener el tiempo desde entry.time o desde results
+                    let time = entry.time || null;
+                    let status = entry.status || 'OK';
+                    
+                    // Si no hay tiempo en entry, buscar en results
+                    if (!time) {
+                        const result = db.getResultByEntryId(entry.entry_id);
+                        if (result) {
+                            time = result.time_seconds;
+                            status = result.status || status;
+                        }
+                    }
+                    
+                    // Solo mostrar si tiene tiempo (resultados completados)
+                    if (time) {
+                        allResults.push({
+                            entry_id: entry.entry_id,
+                            categoria: category.category_name,
+                            category_id: category.category_id,
+                            evento: event.event_name,
+                            event_id: event.event_id,
+                            serie: entry.heat || entry.heat_number || '-',
+                            carril: entry.lane || entry.lane_number || '-',
+                            participante: participant.name || participant.participant_name || 'Sin nombre',
+                            participant_id: participant.participant_id,
+                            club: participant.club || '-',
+                            tiempo: time,
+                            estado: status,
+                            position: '-'
+                        });
+                    }
+                }
+            });
+
+            applyFilters();
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const eventId = document.getElementById('filterEvent').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const searchFilter = normalizarTexto(document.getElementById('searchFilter').value);
+
+            filteredResults = allResults.filter(result => {
+                if (eventId && result.event_id !== eventId) return false;
+                if (statusFilter && result.estado !== statusFilter) return false;
+                if (searchFilter && !normalizarTexto(result.participante).includes(searchFilter)) return false;
+                return true;
+            });
+
+            displayResults();
+            displayPodiums(); // Actualizar podios con los mismos filtros
+        }
+
+        // Display results
+        function displayResults() {
+            const table = document.getElementById('resultsTable');
+            const noResults = document.getElementById('noResults');
+            const tbody = document.getElementById('resultsBody');
+
+            if (filteredResults.length === 0) {
+                table.style.display = 'none';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            table.style.display = 'table';
+            noResults.style.display = 'none';
+
+            // Sort by event, then by heat, then by position
+            const sortedResults = [...filteredResults].sort((a, b) => {
+                // First by event
+                if (a.evento !== b.evento) return a.evento.localeCompare(b.evento);
+                
+                // Then by heat (series)
+                const heatA = typeof a.serie === 'number' ? a.serie : 999;
+                const heatB = typeof b.serie === 'number' ? b.serie : 999;
+                if (heatA !== heatB) return heatA - heatB;
+                
+                // Then by time (for positioning)
+                if (a.estado === 'OK' && b.estado === 'OK') {
+                    return a.tiempo - b.tiempo;
+                }
+                if (a.estado !== 'OK') return 1;
+                if (b.estado !== 'OK') return -1;
+                
+                return 0;
+            });
+
+            // Calculate positions per event
+            let lastEvent = null;
+            let eventPosition = 1;
+            let lastHeat = null;
+
+            // Generate table rows with heat separators
+            let html = '';
+            
+            sortedResults.forEach((result, index) => {
+                // Reset position counter when event changes
+                if (result.evento !== lastEvent) {
+                    eventPosition = 1;
+                    lastEvent = result.evento;
+                    lastHeat = null;
+                }
+                
+                // Add heat separator when heat changes within same event
+                if (result.serie !== lastHeat && typeof result.serie === 'number') {
+                    html += `
+                        <tr style="background: #2E7D32; color: white; font-weight: bold;">
+                            <td colspan="9" style="padding: 10px; text-align: center;">
+                                🏊 ${result.evento} - ${result.categoria} - SERIE ${result.serie}
+                            </td>
+                        </tr>
+                    `;
+                    lastHeat = result.serie;
+                }
+                
+                // Determine position
+                const pos = result.estado === 'OK' ? eventPosition : '-';
+                const timeDisplay = result.tiempo ? result.tiempo.toFixed(2) + 's' : '-';
+                
+                html += `
+                    <tr>
+                        <td class="position-cell" style="text-align: center;">${pos}</td>
+                        <td>${result.evento}</td>
+                        <td>${result.categoria}</td>
+                        <td style="font-weight: 600;">${result.participante}</td>
+                        <td>${result.club || '-'}</td>
+                        <td style="text-align: center;">${result.serie}</td>
+                        <td style="text-align: center;">${result.carril}</td>
+                        <td class="time-cell" style="text-align: center;">${timeDisplay}</td>
+                        <td style="text-align: center;">
+                            <span class="status-badge status-${result.estado.toLowerCase()}">
+                                ${result.estado}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+                
+                // Increment position only for OK results
+                if (result.estado === 'OK') {
+                    eventPosition++;
+                }
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        // Load podiums (now renamed to displayPodiums and uses filtered results)
+        function displayPodiums() {
+            const container = document.getElementById('podiumsContainer');
+            
+            // Usar filteredResults en lugar de todos los datos
+            if (filteredResults.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-state-icon">🏆</div>
+                        <h3>No hay podios con los filtros seleccionados</h3>
+                        <p>Ajusta los filtros para ver más resultados</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Agrupar por evento
+            const eventGroups = {};
+            filteredResults.forEach(result => {
+                if (result.estado === 'OK') { // Solo resultados válidos para podios
+                    if (!eventGroups[result.evento]) {
+                        eventGroups[result.evento] = {
+                            name: result.evento,
+                            category: result.categoria,
+                            results: []
+                        };
+                    }
+                    eventGroups[result.evento].results.push(result);
+                }
+            });
+
+            // Ordenar resultados de cada evento por tiempo
+            Object.keys(eventGroups).forEach(eventoKey => {
+                eventGroups[eventoKey].results.sort((a, b) => a.tiempo - b.tiempo);
+            });
+
+            let html = '';
+            const eventos = Object.keys(eventGroups);
+            const eventsToShow = showAllPodiums ? eventos : eventos.slice(0, 3);
+
+            if (eventsToShow.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-state-icon">🏆</div>
+                        <h3>No hay podios disponibles</h3>
+                        <p>No hay resultados válidos (OK) con los filtros seleccionados</p>
+                    </div>
+                `;
+                return;
+            }
+
+            eventsToShow.forEach(eventoKey => {
+                const eventData = eventGroups[eventoKey];
+                const top3 = eventData.results.slice(0, 3);
+
+                if (top3.length > 0) {
+                    html += `
+                        <div class="podium-card">
+                            <h3>${eventData.name}</h3>
+                            <p style="color: #666; font-size: 0.9em; margin: 5px 0 10px 0;">${eventData.category}</p>
+                    `;
+
+                    top3.forEach((result, index) => {
+                        const medals = ['🥇', '🥈', '🥉'];
+                        const classes = ['podium-first', 'podium-second', 'podium-third'];
+                        const positions = ['1º Lugar', '2º Lugar', '3º Lugar'];
+
+                        html += `
+                            <div class="podium-item ${classes[index]}">
+                                <div class="podium-medal">${medals[index]}</div>
+                                <div class="podium-info">
+                                    <div class="podium-name">${positions[index]}: ${result.participante}</div>
+                                    <div class="podium-time">
+                                        ${result.tiempo.toFixed(2)}s
+                                        ${result.club ? ` • ${result.club}` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += `</div>`;
+                }
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Toggle podiums view
+        function togglePodiums() {
+            showAllPodiums = !showAllPodiums;
+            const btn = document.getElementById('podiumToggle');
+            btn.textContent = showAllPodiums ? '👁️ Mostrar Menos' : '👁️ Mostrar Todos';
+            displayPodiums();
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            const results = db.getResults();
+            const publicData = db.getPublicView();
+            const events = [...new Set(publicData.map(d => d.evento))];
+
+            document.getElementById('statTotalResults').textContent = results.length;
+            document.getElementById('statOK').textContent = results.filter(r => r.status === 'OK').length;
+            document.getElementById('statDQ').textContent = results.filter(r => r.status === 'DQ').length;
+            document.getElementById('statEvents').textContent = events.length;
+        }
+
+        // Show temporary message
+        function showTemporaryMessage(message) {
+            const div = document.createElement('div');
+            div.className = 'alert alert-success';
+            div.textContent = message;
+            div.style.position = 'fixed';
+            div.style.top = '100px';
+            div.style.right = '20px';
+            div.style.zIndex = '1000';
+            document.body.appendChild(div);
+
+            setTimeout(() => {
+                div.remove();
+            }, 3000);
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+        });
+    </script>
+
+    <!-- Footer -->
+    <footer style="background: linear-gradient(135deg, #2E7D32, #1B5E20); color: white; padding: 30px 20px; margin-top: 40px; text-align: center;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <h3 style="margin: 0 0 10px 0; font-size: 1.5em;">🏊 Olimpiadas Río de Oro 2025</h3>
+            <p style="margin: 5px 0; opacity: 0.9;">Sistema de Gestión de Competencias de Natación</p>
+            <p style="margin: 5px 0; opacity: 0.8; font-size: 0.9em;">📅 2 de Noviembre, 2025 | 👥 96 Participantes | 🏆 9 Categorías</p>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.3);">
+                <p style="margin: 0; font-size: 0.85em; opacity: 0.7;">Desarrollado con ❤️ para la comunidad deportiva</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

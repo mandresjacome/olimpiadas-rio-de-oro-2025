@@ -1,0 +1,2445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - Inscripciones</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .wizard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .wizard-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 10px;
+        }
+        
+        .wizard-step {
+            flex: 1;
+            text-align: center;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .wizard-step:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .wizard-step.active {
+            background: #2E7D32;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        }
+        
+        .wizard-step.completed {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .wizard-step .step-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .wizard-step .step-title {
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+        
+        .wizard-step .step-desc {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+        
+        .wizard-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .wizard-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .info-box {
+            background: #E3F2FD;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .info-box h3 {
+            margin: 0 0 10px 0;
+            color: #2E7D32;
+        }
+        
+        .info-box p {
+            margin: 5px 0;
+        }
+        
+        .heat-explanation {
+            background: #FFF3E0;
+            border-left: 4px solid #FF9800;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #2E7D32;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .quick-event {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px dashed #ccc;
+            margin-bottom: 15px;
+        }
+        
+        .lane-grid {
+            display: grid;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .lane-item {
+            display: grid;
+            grid-template-columns: 60px 1fr 150px 100px 100px;
+            gap: 10px;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .lane-item:hover {
+            border-color: #2E7D32;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .lane-item.has-swimmer {
+            background: #f8f9fa;
+        }
+        
+        .lane-number {
+            font-weight: bold;
+            font-size: 24px;
+            color: white;
+            text-align: center;
+            background: #2E7D32;
+            padding: 10px;
+            border-radius: 8px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .lane-swimmer {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .lane-swimmer select {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .lane-time input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .lane-time input:focus {
+            border-color: #4CAF50;
+        }
+        
+        .lane-status select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .lane-status select.status-ok { background: #D4EDDA; color: #155724; }
+        .lane-status select.status-dq { background: #F8D7DA; color: #721c24; }
+        .lane-status select.status-dns { background: #E2E3E5; color: #383d41; }
+        .lane-status select.status-dnf { background: #FFF3CD; color: #856404; }
+        
+        .wizard-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+        
+        .btn-wizard {
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-wizard:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-prev {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-prev:hover:not(:disabled) {
+            background: #5a6268;
+        }
+        
+        .btn-next {
+            background: #2E7D32;
+            color: white;
+        }
+        
+        .btn-next:hover:not(:disabled) {
+            background: #1B5E20;
+        }
+        
+        .btn-save {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-save:hover:not(:disabled) {
+            background: #45a049;
+        }
+        
+        .add-participant-inline {
+            display: grid;
+            grid-template-columns: 1fr 150px 80px 100px;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #E3F2FD;
+            border-radius: 4px;
+        }
+        
+        .add-participant-inline input {
+            padding: 8px;
+            border: 2px solid #2E7D32;
+            border-radius: 4px;
+        }
+        
+        .summary-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+        
+        .summary-label {
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .summary-value {
+            font-weight: bold;
+            color: #2E7D32;
+        }
+        
+        /* Estilos para Administrar Resultados */
+        .edit-row {
+            background: #FFF3E0;
+            border-left: 4px solid #FF9800;
+        }
+        
+        .edit-input {
+            padding: 6px 10px;
+            border: 2px solid #2E7D32;
+            border-radius: 4px;
+            font-size: 0.95em;
+            width: 100%;
+            max-width: 120px;
+        }
+        
+        .edit-select {
+            padding: 6px 10px;
+            border: 2px solid #2E7D32;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+        
+        .save-edit-btn {
+            background: #2E7D32;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        .save-edit-btn:hover {
+            background: #1B5E20;
+        }
+        
+        .cancel-edit-btn {
+            background: #757575;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 5px;
+        }
+        
+        .cancel-edit-btn:hover {
+            background: #616161;
+        }
+        
+        .event-filter {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        /* Estilos del Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            overflow-y: auto;
+        }
+        
+        .modal-container {
+            position: relative;
+            max-width: 900px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+        
+        .modal-body {
+            padding: 20px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎮 Panel de Control de Inscripciones</h1>
+        <p>Inscribe a los nadadores en las pruebas y gestiona las series de competencia</p>
+    </div>
+
+    <!-- Navigation Menu -->
+    <div class="container" style="margin-bottom: 20px;">
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <a href="index.html" class="btn" style="background: #17a2b8; color: white; text-decoration: none;">
+                📋 Dashboard
+            </a>
+            <button onclick="mostrarModoGestionar()" id="btnModoGestionar" class="btn btn-primary" style="background: #2E7D32; color: white;">
+                📋 Gestionar Inscripciones
+            </button>
+            <button onclick="mostrarModoDigitar()" id="btnModoDigitar" class="btn" style="background: #1976D2; color: white;">
+                ⏱️ Digitar Tiempos
+            </button>
+            <button onclick="mostrarModoResultados()" id="btnModoResultados" class="btn" style="background: #FF9800; color: white;">
+                🔧 Administrar Resultados
+            </button>
+            <a href="public-view.html" class="btn btn-success" style="text-decoration: none;">
+                📊 Ver Resultados
+            </a>
+        </div>
+    </div>
+
+    <!-- MODO: GESTIONAR INSCRIPCIONES EXISTENTES -->
+    <div id="modoGestionar" style="display: none;">
+        <div class="container">
+            <div class="card">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2>📋 Gestionar Inscripciones Existentes</h2>
+                        <p style="margin: 5px 0 0 0; color: #666;">Ver y editar heats, carriles y pruebas de los nadadores inscritos</p>
+                    </div>
+                    <button onclick="abrirModalCrearInscripcion()" class="btn btn-success" style="font-size: 1.1em; padding: 12px 24px;">
+                        ➕ Nueva Inscripción
+                    </button>
+                </div>
+                
+                <!-- Filtros -->
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 15px 0;">🔍 Filtros</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Categoría:</label>
+                            <select id="filtroCategoria" onchange="filtrarInscripciones()">
+                                <option value="">-- Todas las categorías --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Prueba:</label>
+                            <select id="filtroPrueba" onchange="filtrarInscripciones()">
+                                <option value="">-- Todas las pruebas --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Heat:</label>
+                            <select id="filtroHeat" onchange="filtrarInscripciones()">
+                                <option value="">-- Todos los heats --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Buscar Nadador:</label>
+                            <input type="text" id="filtroBuscar" placeholder="Nombre del nadador..." oninput="filtrarInscripciones()">
+                        </div>
+                        <div class="form-group">
+                            <label>Estado:</label>
+                            <select id="filtroEstado" onchange="filtrarInscripciones()">
+                                <option value="">Todas</option>
+                                <option value="sinAsignar">Sin heat/carril asignado</option>
+                                <option value="asignadas">Ya asignadas</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Inscripciones -->
+                <div class="table-container">
+                    <table id="tablaInscripciones">
+                        <thead>
+                            <tr>
+                                <th>Nadador</th>
+                                <th>Club</th>
+                                <th>Categoría</th>
+                                <th>Prueba</th>
+                                <th style="width: 80px;">Heat</th>
+                                <th style="width: 80px;">Carril</th>
+                                <th style="width: 200px;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaInscripcionesBody">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 40px; color: #999;">
+                                    Cargando inscripciones...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Estadísticas -->
+                <div style="margin-top: 20px; padding: 15px; background: #E8F5E9; border-radius: 8px;">
+                    <strong>📊 Estadísticas:</strong>
+                    <span id="statsInscripciones">0 inscripciones encontradas</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODO: DIGITAR TIEMPOS -->
+    <div id="modoDigitar" style="display: none;">
+        <div class="container">
+            <div class="card">
+                <div class="card-header">
+                    <h2>⏱️ Digitar Tiempos</h2>
+                    <p style="margin: 5px 0 0 0; color: #666;">Selecciona una prueba y heat para digitar los tiempos de todos los nadadores</p>
+                </div>
+                
+                <!-- Filtros -->
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin: 0 0 15px 0;">🔍 Seleccionar Prueba y Heat</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Categoría:</label>
+                            <select id="digitarCategoria" onchange="actualizarPruebasDigitar()">
+                                <option value="">-- Selecciona una categoría --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Prueba:</label>
+                            <select id="digitarPrueba" onchange="actualizarHeatsDigitar()">
+                                <option value="">-- Selecciona una prueba --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Heat:</label>
+                            <select id="digitarHeat" onchange="cargarNadadoresParaDigitar()">
+                                <option value="">-- Selecciona un heat --</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button onclick="cargarNadadoresParaDigitar()" class="btn btn-primary" style="width: 100%;">
+                                🔄 Cargar Nadadores
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Digitación de Tiempos -->
+                <div id="digitarContenedor" style="display: none;">
+                    <div class="table-container">
+                        <table id="tablaDigitarTiempos">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px;">Carril</th>
+                                    <th>Nadador</th>
+                                    <th>Club</th>
+                                    <th style="width: 150px;">Tiempo (seg)</th>
+                                    <th style="width: 150px;">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaDigitarBody">
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button onclick="guardarTodosLosTiempos()" class="btn btn-success" style="font-size: 1.1em; padding: 12px 30px;">
+                            💾 Guardar Todos los Tiempos
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODO: ADMINISTRAR RESULTADOS -->
+    <div id="modoResultados" style="display: none;">
+        <div class="container">
+            <!-- Filter Section -->
+            <div class="event-filter">
+                <h3>🔍 Seleccionar Prueba</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Categoría:</label>
+                        <select id="filterCategoryResults" onchange="updateEventFilterResults()">
+                            <option value="">-- Selecciona una categoría --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Prueba:</label>
+                        <select id="filterEventResults" onchange="filterByEventResults()">
+                            <option value="">-- Selecciona una prueba --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Table -->
+            <div class="card">
+                <div class="results-header">
+                    <h2>📊 Todos los Resultados</h2>
+                    <div>
+                        <button onclick="loadAllResultsAdmin()" class="btn btn-primary">
+                            🔄 Recargar
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table id="resultsTableAdmin">
+                        <thead>
+                            <tr>
+                                <th>Nadador</th>
+                                <th>Categoría</th>
+                                <th>Prueba</th>
+                                <th>Heat</th>
+                                <th>Carril</th>
+                                <th>Tiempo</th>
+                                <th>Estado</th>
+                                <th>Posición</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBodyAdmin">
+                            <tr>
+                                <td colspan="9" style="text-align: center; padding: 40px; color: #999;">
+                                    Cargando resultados...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="card">
+                <h3>📈 Estadísticas</h3>
+                <div class="form-row">
+                    <div style="background: #E8F5E9; padding: 20px; border-radius: 8px; text-align: center;">
+                        <h2 style="margin: 0; color: #2E7D32;" id="totalResultsAdmin">0</h2>
+                        <p style="margin: 5px 0 0 0; color: #666;">Resultados Totales</p>
+                    </div>
+                    <div style="background: #E3F2FD; padding: 20px; border-radius: 8px; text-align: center;">
+                        <h2 style="margin: 0; color: #1976D2;" id="totalEventsAdmin">0</h2>
+                        <p style="margin: 5px 0 0 0; color: #666;">Pruebas con Resultados</p>
+                    </div>
+                    <div style="background: #FFF3E0; padding: 20px; border-radius: 8px; text-align: center;">
+                        <h2 style="margin: 0; color: #F57C00;" id="totalParticipantsAdmin">0</h2>
+                        <p style="margin: 5px 0 0 0; color: #666;">Nadadores Únicos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CREAR NUEVA INSCRIPCIÓN -->
+    <div id="modalCrearInscripcion" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div>
+                    <h2 style="margin: 0;">➕ Crear Nueva Inscripción</h2>
+                    <p style="margin: 5px 0 0 0; opacity: 0.9;">Wizard paso a paso para crear inscripciones</p>
+                </div>
+                <button class="modal-close" onclick="cerrarModalCrearInscripcion()">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="modoCrear" class="wizard-container" style="margin: 0;">
+                    <!-- Event Banner -->
+                    <div style="background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                        <div style="text-align: center;">
+                            <h2 style="margin: 0 0 10px 0; font-size: 24px;">🏊 Olimpiadas Río de Oro 2025</h2>
+                            <p style="margin: 0; opacity: 0.95; font-size: 14px;">
+                                <strong>Club Deportivo SPORTLAND</strong> | Parque Recreacional Guatiguará, Piedecuesta<br>
+                                📅 Domingo, 2 de noviembre de 2025 | 🕐 7:00 a.m. - 5:00 p.m.
+                            </p>
+                            <p style="margin: 10px 0 0 0; font-style: italic; opacity: 0.9; font-size: 13px;">
+                                "El deporte nos une, el orgullo piedecuestano nos identifica"
+                            </p>
+                        </div>
+                    </div>
+
+        <!-- Wizard Steps -->
+        <div class="wizard-steps">
+            <div class="wizard-step active" onclick="goToStep(1)" data-step="1">
+                <div class="step-number">1</div>
+                <div class="step-title">📋 Prueba</div>
+                <div class="step-desc">Seleccionar o crear</div>
+            </div>
+            <div class="wizard-step" onclick="goToStep(2)" data-step="2">
+                <div class="step-number">2</div>
+                <div class="step-title">🏊 Nadadores</div>
+                <div class="step-desc">Asignar a carriles</div>
+            </div>
+            <div class="wizard-step" onclick="goToStep(3)" data-step="3">
+                <div class="step-number">3</div>
+                <div class="step-title">⏱️ Tiempos</div>
+                <div class="step-desc">Digitar resultados</div>
+            </div>
+            <div class="wizard-step" onclick="goToStep(4)" data-step="4">
+                <div class="step-number">4</div>
+                <div class="step-title">💾 Guardar</div>
+                <div class="step-desc">Finalizar y continuar</div>
+            </div>
+        </div>
+
+        <!-- Step 1: Event Selection/Creation -->
+        <div class="wizard-content active" id="step1Content">
+            <h2>📋 Paso 1: Seleccionar o Crear Prueba</h2>
+            
+            <div class="info-box">
+                <h3>ℹ️ Información</h3>
+                <p>Selecciona una prueba existente o crea una nueva para este heat.</p>
+            </div>
+
+            <div class="form-group">
+                <label>¿Qué quieres hacer?</label>
+                <div style="display: flex; gap: 15px;">
+                    <button class="btn btn-primary" onclick="toggleEventMode('select')" id="btnSelectMode">
+                        📋 Seleccionar Prueba Existente
+                    </button>
+                    <button class="btn btn-secondary" onclick="toggleEventMode('create')" id="btnCreateMode">
+                        ➕ Crear Nueva Prueba
+                    </button>
+                </div>
+            </div>
+
+            <div id="selectEventSection" style="display: block;">
+                <div class="form-group">
+                    <label for="existingEvent">Selecciona una prueba:</label>
+                    <select id="existingEvent" class="form-control">
+                        <option value="">-- Selecciona una prueba --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="createEventSection" style="display: none;">
+                <div class="quick-event">
+                    <h4>➕ Crear Nueva Prueba</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newCategory">Categoría:</label>
+                            <input type="text" id="newCategory" placeholder="Ej: Infantil A, Juvenil B">
+                        </div>
+                        <div class="form-group">
+                            <label for="newEventName">Nombre de la Prueba:</label>
+                            <input type="text" id="newEventName" placeholder="Ej: 25M Libre, 100M Combinado">
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="createQuickEvent()">
+                        ✅ Crear y Usar esta Prueba
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="heatNumber">Número de Heat/Serie:</label>
+                <select id="heatNumber" style="padding: 8px; border: 2px solid #2E7D32; border-radius: 4px; font-size: 14px; font-weight: bold;">
+                    ${Array.from({length: 20}, (_, i) => i + 1).map(h => 
+                        `<option value="${h}" ${h === 1 ? 'selected' : ''}>${h}</option>`
+                    ).join('')}
+                </select>
+                <small style="color: #666; display: block; margin-top: 5px;">
+                    💡 Si es la primera vez que corres esta prueba, usa Heat 1. Si ya corriste heats anteriores, incrementa el número.
+                </small>
+            </div>
+
+            <div class="wizard-nav">
+                <button class="btn-wizard btn-prev" disabled>⬅️ Anterior</button>
+                <button class="btn-wizard btn-next" onclick="nextStep()">Siguiente ➡️</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Assign Swimmers to Lanes -->
+        <div class="wizard-content" id="step2Content">
+            <h2>🏊 Paso 2: Asignar Nadadores a Carriles</h2>
+            
+            <div class="summary-box">
+                <div class="summary-item">
+                    <span class="summary-label">Prueba:</span>
+                    <span class="summary-value" id="summaryEvent">-</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Heat/Serie:</span>
+                    <span class="summary-value" id="summaryHeat">-</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h3>ℹ️ Instrucciones</h3>
+                <p>Asigna un nadador a cada carril. Puedes seleccionar nadadores existentes o agregar nuevos al instante.</p>
+                <p><strong>Tip:</strong> No es necesario llenar todos los carriles. Deja vacíos los que no se usen.</p>
+            </div>
+
+            <div class="lane-grid" id="laneAssignments">
+                <!-- Se genera dinámicamente -->
+            </div>
+
+            <div id="lanesSummary" style="margin-top: 15px; padding: 10px; background: #E3F2FD; border-radius: 6px; display: none;">
+                <strong>📊 Resumen:</strong> <span id="lanesSummaryText"></span>
+            </div>
+
+            <div class="wizard-nav">
+                <button class="btn-wizard btn-prev" onclick="prevStep()">⬅️ Anterior</button>
+                <button class="btn-wizard btn-next" onclick="nextStep()">Siguiente ➡️</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Enter Times -->
+        <div class="wizard-content" id="step3Content">
+            <h2>⏱️ Paso 3: Digitar Tiempos</h2>
+            
+            <div class="summary-box">
+                <div class="summary-item">
+                    <span class="summary-label">Prueba:</span>
+                    <span class="summary-value" id="summaryEvent2">-</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Heat/Serie:</span>
+                    <span class="summary-value" id="summaryHeat2">-</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Nadadores:</span>
+                    <span class="summary-value" id="summarySwimmers">-</span>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h3>ℹ️ Instrucciones</h3>
+                <p>Ingresa los tiempos en <strong>segundos</strong> (usa punto decimal, ej: 25.34)</p>
+                <p><strong>Estados:</strong></p>
+                <ul style="margin: 5px 0;">
+                    <li><strong>OK</strong> = Tiempo válido</li>
+                    <li><strong>DQ</strong> = Descalificado</li>
+                    <li><strong>DNS</strong> = No se presentó (Did Not Start)</li>
+                    <li><strong>DNF</strong> = No terminó (Did Not Finish)</li>
+                </ul>
+            </div>
+
+            <div class="lane-grid" id="timeEntry">
+                <!-- Se genera dinámicamente -->
+            </div>
+
+            <div class="wizard-nav">
+                <button class="btn-wizard btn-prev" onclick="prevStep()">⬅️ Anterior</button>
+                <button class="btn-wizard btn-next" onclick="nextStep()">Siguiente ➡️</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Save and Continue -->
+        <div class="wizard-content" id="step4Content">
+            <h2>💾 Paso 4: Guardar Resultados</h2>
+            
+            <div class="info-box" style="background: #D4EDDA; border-color: #4CAF50;">
+                <h3>✅ Revisión Final</h3>
+                <p>Revisa que todo esté correcto antes de guardar.</p>
+            </div>
+
+            <div class="summary-box">
+                <div class="summary-item">
+                    <span class="summary-label">Prueba:</span>
+                    <span class="summary-value" id="summaryEvent3">-</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Heat/Serie:</span>
+                    <span class="summary-value" id="summaryHeat3">-</span>
+                </div>
+            </div>
+
+            <div id="finalReview" style="margin: 20px 0;">
+                <!-- Tabla de revisión -->
+            </div>
+
+            <div class="wizard-nav">
+                <button class="btn-wizard btn-prev" onclick="prevStep()">⬅️ Anterior</button>
+                <button class="btn-wizard btn-save" onclick="saveResults()">💾 Guardar y Continuar</button>
+            </div>
+
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="btn btn-success" onclick="saveAndNew()" style="display: none;" id="btnNextHeat">
+                    ⏭️ Guardar y Cargar Siguiente Heat
+                </button>
+                <button class="btn btn-primary" onclick="resetWizard()" style="display: none; margin-left: 10px;" id="btnNewEvent">
+                    🔄 Nueva Prueba
+                </button>
+            </div>
+        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- FIN MODAL CREAR INSCRIPCIÓN -->
+
+    <script src="js/database.js"></script>
+    <script src="js/event-data.js"></script>
+    <script>
+        let currentStep = 1;
+        let sessionData = {
+            eventId: null,
+            eventName: null,
+            categoryId: null,
+            categoryName: null,
+            heat: 1,
+            lanes: {}
+        };
+
+        // Initialize
+        function init() {
+            // Verificar que database.js está cargado
+            if (typeof db === 'undefined') {
+                alert('❌ Error: No se pudo cargar el sistema de base de datos.\n\nAsegúrate de que el archivo js/database.js existe.');
+                return;
+            }
+            
+            try {
+                // Cargar datos oficiales del evento automáticamente si no existen
+                if (typeof loadSportlandEventData === 'function') {
+                    const categories = db.getCategories();
+                    if (categories.length === 0) {
+                        console.log('📥 Cargando datos oficiales del evento...');
+                        loadSportlandEventData();
+                    }
+                }
+                
+                loadExistingEvents();
+                loadParticipants();
+                
+                // Mostrar por defecto Gestionar Inscripciones
+                mostrarModoGestionar();
+            } catch (error) {
+                console.error('Error al inicializar:', error);
+                alert('⚠️ Error al cargar datos. La página se recargará.');
+                location.reload();
+            }
+        }
+
+        function loadExistingEvents() {
+            const events = db.getEvents();
+            const select = document.getElementById('existingEvent');
+            select.innerHTML = '<option value="">-- Selecciona una prueba --</option>';
+            
+            events.forEach(event => {
+                const category = db.getCategoryById(event.category_id);
+                const option = document.createElement('option');
+                option.value = event.event_id;
+                option.textContent = `${event.event_name} - ${category ? category.category_name : ''}`;
+                select.appendChild(option);
+            });
+        }
+
+        function loadParticipants() {
+            window.allParticipants = db.getParticipants();
+        }
+
+        function toggleEventMode(mode) {
+            if (mode === 'select') {
+                document.getElementById('selectEventSection').style.display = 'block';
+                document.getElementById('createEventSection').style.display = 'none';
+                document.getElementById('btnSelectMode').className = 'btn btn-primary';
+                document.getElementById('btnCreateMode').className = 'btn btn-secondary';
+            } else {
+                document.getElementById('selectEventSection').style.display = 'none';
+                document.getElementById('createEventSection').style.display = 'block';
+                document.getElementById('btnSelectMode').className = 'btn btn-secondary';
+                document.getElementById('btnCreateMode').className = 'btn btn-primary';
+            }
+        }
+
+        function createQuickEvent() {
+            const categoryName = document.getElementById('newCategory').value.trim();
+            const eventName = document.getElementById('newEventName').value.trim();
+
+            if (!categoryName || !eventName) {
+                alert('⚠️ Completa la categoría y el nombre de la prueba');
+                return;
+            }
+
+            try {
+                // Verificar que db existe
+                if (typeof db === 'undefined') {
+                    alert('❌ Error: Sistema de base de datos no cargado. Recarga la página.');
+                    return;
+                }
+
+                // Crear categoría si no existe
+                let category = db.getCategories().find(c => c.category_name === categoryName);
+                if (!category) {
+                    category = db.addCategory(categoryName);
+                }
+
+                // Crear evento
+                const event = db.addEvent(eventName, category.category_id);
+
+                sessionData.eventId = event.event_id;
+                sessionData.eventName = event.event_name;
+                sessionData.categoryId = category.category_id;
+                sessionData.categoryName = categoryName;
+
+                alert(`✅ Prueba "${eventName}" creada exitosamente en categoría "${categoryName}"`);
+                
+                // Recargar eventos y seleccionar el nuevo
+                loadExistingEvents();
+                setTimeout(() => {
+                    document.getElementById('existingEvent').value = event.event_id;
+                }, 100);
+                
+            } catch (error) {
+                console.error('Error al crear prueba:', error);
+                alert(`❌ Error al crear la prueba: ${error.message}\n\nIntenta recargar la página.`);
+            }
+        }
+
+        function goToStep(step) {
+            if (step > currentStep && !validateCurrentStep()) {
+                return;
+            }
+            
+            // Hide all
+            document.querySelectorAll('.wizard-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.wizard-step').forEach(el => {
+                el.classList.remove('active');
+                el.classList.remove('completed');
+            });
+
+            // Show current
+            document.getElementById(`step${step}Content`).classList.add('active');
+            document.querySelector(`.wizard-step[data-step="${step}"]`).classList.add('active');
+
+            // Mark completed
+            for (let i = 1; i < step; i++) {
+                document.querySelector(`.wizard-step[data-step="${i}"]`).classList.add('completed');
+            }
+
+            currentStep = step;
+
+            // Prepare step
+            if (step === 2) prepareStep2();
+            if (step === 3) prepareStep3();
+            if (step === 4) prepareStep4();
+        }
+
+        function validateCurrentStep() {
+            if (currentStep === 1) {
+                const eventId = document.getElementById('existingEvent').value;
+                const heat = parseInt(document.getElementById('heatNumber').value);
+
+                if (!eventId) {
+                    alert('⚠️ Selecciona o crea una prueba');
+                    return false;
+                }
+
+                if (!heat || heat < 1) {
+                    alert('⚠️ Ingresa un número de heat válido');
+                    return false;
+                }
+
+                const event = db.getEventById(eventId);
+                const category = db.getCategoryById(event.category_id);
+
+                sessionData.eventId = eventId;
+                sessionData.eventName = event.event_name;
+                sessionData.categoryId = event.category_id;
+                sessionData.categoryName = category.category_name;
+                sessionData.heat = heat;
+
+                return true;
+            }
+
+            if (currentStep === 2) {
+                // At least one swimmer assigned
+                const hasSwimmers = Object.values(sessionData.lanes).some(lane => lane.participantId);
+                if (!hasSwimmers) {
+                    alert('⚠️ Asigna al menos un nadador');
+                    return false;
+                }
+                return true;
+            }
+
+            if (currentStep === 3) {
+                // Validate times
+                for (let lane in sessionData.lanes) {
+                    const laneData = sessionData.lanes[lane];
+                    if (laneData.participantId) {
+                        const status = laneData.status || 'OK';
+                        const time = laneData.time;
+
+                        if (status === 'OK' && (!time || time <= 0 || time > 500)) {
+                            alert(`⚠️ Tiempo inválido en carril ${lane}. Debe ser entre 0.01 y 500 segundos.`);
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+
+            return true;
+        }
+
+        function nextStep() {
+            if (validateCurrentStep()) {
+                goToStep(currentStep + 1);
+            }
+        }
+
+        function prevStep() {
+            goToStep(currentStep - 1);
+        }
+
+        function prepareStep2() {
+            document.getElementById('summaryEvent').textContent = `${sessionData.eventName} - ${sessionData.categoryName}`;
+            document.getElementById('summaryHeat').textContent = sessionData.heat;
+
+            // DEBUG: Ver qué está pasando
+            console.log('📊 Depuración del filtro:');
+            console.log('Categoría seleccionada:', sessionData.categoryName, 'ID:', sessionData.categoryId);
+            console.log('Total participantes:', window.allParticipants.length);
+            
+            // Filtrar participantes: aquellos que tienen entries en CUALQUIER evento de esta categoría
+            const entries = db.getEntries();
+            console.log('Total entries en DB:', entries.length);
+            
+            const participantIdsInCategory = new Set();
+            
+            entries.forEach(entry => {
+                const event = db.getEventById(entry.event_id);
+                if (event && event.category_id === sessionData.categoryId) {
+                    participantIdsInCategory.add(entry.participant_id);
+                }
+            });
+            
+            console.log('Participantes con entries en esta categoría:', participantIdsInCategory.size);
+            
+            const filteredParticipants = window.allParticipants.filter(participant => 
+                participantIdsInCategory.has(participant.participant_id)
+            );
+            
+            console.log('Participantes filtrados:', filteredParticipants.length);
+            
+            // Ordenar alfabéticamente para facilitar búsqueda
+            filteredParticipants.sort((a, b) => a.name.localeCompare(b.name));
+
+            const container = document.getElementById('laneAssignments');
+            container.innerHTML = '';
+
+            // Mensaje informativo si hay participantes filtrados
+            if (filteredParticipants.length > 0 && filteredParticipants.length < window.allParticipants.length) {
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'info-box';
+                infoDiv.style.marginBottom = '20px';
+                infoDiv.innerHTML = `
+                    <h4 style="margin: 0 0 5px 0; color: #2E7D32;">ℹ️ Filtro por Categoría</h4>
+                    <p style="margin: 0; font-size: 14px;">
+                        Mostrando solo los <strong>${filteredParticipants.length} nadadores inscritos en la categoría "${sessionData.categoryName}"</strong>
+                        de un total de ${window.allParticipants.length} participantes.
+                    </p>
+                `;
+                container.appendChild(infoDiv);
+            } else if (filteredParticipants.length === 0) {
+                const warningDiv = document.createElement('div');
+                warningDiv.className = 'heat-explanation';
+                warningDiv.innerHTML = `
+                    <h4 style="margin: 0 0 5px 0; color: #FF9800;">⚠️ No hay nadadores inscritos en esta categoría</h4>
+                    <p style="margin: 0; font-size: 14px;">
+                        No hay participantes inscritos en eventos de la categoría "${sessionData.categoryName}".
+                        Puedes agregar nuevos nadadores usando la opción "➕ Agregar nuevo nadador" en cada carril.
+                    </p>
+                `;
+                container.appendChild(warningDiv);
+            }
+
+            for (let lane = 1; lane <= 6; lane++) {
+                const laneDiv = document.createElement('div');
+                laneDiv.className = 'lane-item';
+                laneDiv.innerHTML = `
+                    <div class="lane-number">${lane}</div>
+                    <div class="lane-swimmer">
+                        <select id="lane${lane}Swimmer" onchange="updateLaneSwimmer(${lane})">
+                            <option value="">-- Carril vacío --</option>
+                            ${filteredParticipants.map(p => 
+                                `<option value="${p.participant_id}">${p.name}${p.club_or_team ? ' (' + p.club_or_team + ')' : ''}</option>`
+                            ).join('')}
+                            <option value="new">➕ Agregar nuevo nadador...</option>
+                        </select>
+                        <div id="lane${lane}NewForm" style="display: none;">
+                            <div class="add-participant-inline">
+                                <input type="text" id="lane${lane}NewName" placeholder="Nombre completo">
+                                <input type="text" id="lane${lane}NewClub" placeholder="Club (opcional)">
+                                <select id="lane${lane}NewGender">
+                                    <option value="M">M</option>
+                                    <option value="F">F</option>
+                                </select>
+                                <button class="btn btn-sm btn-success" onclick="addNewSwimmer(${lane})">✅ Agregar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="color: #666; font-size: 12px;" id="lane${lane}Info"></div>
+                `;
+                container.appendChild(laneDiv);
+
+                // Restore if exists
+                if (sessionData.lanes[lane]) {
+                    document.getElementById(`lane${lane}Swimmer`).value = sessionData.lanes[lane].participantId;
+                }
+            }
+        }
+
+        function updateLaneSwimmer(lane) {
+            const select = document.getElementById(`lane${lane}Swimmer`);
+            const value = select.value;
+
+            if (value === 'new') {
+                document.getElementById(`lane${lane}NewForm`).style.display = 'block';
+                select.value = '';
+            } else if (value) {
+                // Verificar que el participante no esté ya asignado en otro carril del mismo heat
+                const alreadyAssigned = Object.keys(sessionData.lanes).find(existingLane => {
+                    return existingLane != lane && sessionData.lanes[existingLane].participantId === value;
+                });
+
+                if (alreadyAssigned) {
+                    const participant = window.allParticipants.find(p => p.participant_id === value);
+                    alert(`⚠️ ${participant.name} ya está asignado en el Carril ${alreadyAssigned}\n\nUn nadador no puede competir dos veces en el mismo heat.`);
+                    select.value = '';
+                    updateLanesSummary(); // Actualizar resumen
+                    return;
+                }
+
+                // Verificar si ya está inscrito en otro heat de este mismo evento
+                const entries = db.getEntries();
+                const previousEntry = entries.find(e => 
+                    e.event_id === sessionData.eventId && 
+                    e.participant_id === value
+                );
+
+                if (previousEntry && previousEntry.heat != sessionData.heat) {
+                    const participant = window.allParticipants.find(p => p.participant_id === value);
+                    const confirmMsg = `⚠️ ATENCIÓN: ${participant.name} ya está inscrito en esta prueba en el Heat ${previousEntry.heat}, Carril ${previousEntry.lane}.\n\n¿Estás seguro que quieres inscribirlo también en el Heat ${sessionData.heat}?\n\n(Esto podría ser un error, normalmente un nadador solo compite una vez por prueba)`;
+                    
+                    if (!confirm(confirmMsg)) {
+                        select.value = '';
+                        updateLanesSummary(); // Actualizar resumen
+                        return;
+                    }
+                }
+
+                document.getElementById(`lane${lane}NewForm`).style.display = 'none';
+                const participant = window.allParticipants.find(p => p.participant_id === value);
+                
+                if (!sessionData.lanes[lane]) {
+                    sessionData.lanes[lane] = {};
+                }
+                sessionData.lanes[lane].participantId = value;
+                sessionData.lanes[lane].participantName = participant.name;
+                
+                updateLanesSummary(); // Actualizar resumen
+            } else {
+                delete sessionData.lanes[lane];
+                updateLanesSummary(); // Actualizar resumen
+            }
+        }
+
+        function updateLanesSummary() {
+            const summaryDiv = document.getElementById('lanesSummary');
+            const summaryText = document.getElementById('lanesSummaryText');
+            
+            if (!summaryDiv || !summaryText) return; // Si no estamos en el paso 2
+            
+            const assignedCount = Object.keys(sessionData.lanes).length;
+            
+            if (assignedCount === 0) {
+                summaryDiv.style.display = 'none';
+            } else {
+                summaryDiv.style.display = 'block';
+                
+                // Verificar duplicados
+                const participantIds = Object.values(sessionData.lanes).map(l => l.participantId);
+                const uniqueIds = [...new Set(participantIds)];
+                
+                if (participantIds.length !== uniqueIds.length) {
+                    summaryDiv.style.background = '#FFF3CD';
+                    summaryDiv.style.border = '2px solid #FFC107';
+                    summaryText.innerHTML = `${assignedCount} carriles asignados, pero <strong style="color: red;">HAY DUPLICADOS</strong>. Por favor corrige antes de continuar.`;
+                } else {
+                    summaryDiv.style.background = '#D4EDDA';
+                    summaryDiv.style.border = '2px solid #4CAF50';
+                    summaryText.innerHTML = `✅ ${assignedCount} nadador(es) único(s) asignado(s) correctamente.`;
+                }
+            }
+        }
+
+        function addNewSwimmer(lane) {
+            const name = document.getElementById(`lane${lane}NewName`).value.trim();
+            const club = document.getElementById(`lane${lane}NewClub`).value.trim();
+            const gender = document.getElementById(`lane${lane}NewGender`).value;
+
+            if (!name) {
+                alert('⚠️ Ingresa el nombre del nadador');
+                return;
+            }
+
+            try {
+                // Usar la función correcta de database.js
+                const participant = db.addParticipant(name, club, gender);
+                window.allParticipants.push(participant);
+
+                // Update select
+                const select = document.getElementById(`lane${lane}Swimmer`);
+                const option = document.createElement('option');
+                option.value = participant.participant_id;
+                option.textContent = `${name}${club ? ' (' + club + ')' : ''}`;
+                select.insertBefore(option, select.lastElementChild);
+                select.value = participant.participant_id;
+
+                // Hide form
+                document.getElementById(`lane${lane}NewForm`).style.display = 'none';
+
+                // Update session
+                if (!sessionData.lanes[lane]) {
+                    sessionData.lanes[lane] = {};
+                }
+                sessionData.lanes[lane].participantId = participant.participant_id;
+                sessionData.lanes[lane].participantName = name;
+
+                // Actualizar resumen
+                updateLanesSummary();
+
+                alert(`✅ Nadador "${name}" agregado exitosamente`);
+            } catch (error) {
+                console.error('Error al agregar nadador:', error);
+                alert(`❌ Error al agregar nadador: ${error.message}`);
+            }
+        }
+
+        function prepareStep3() {
+            document.getElementById('summaryEvent2').textContent = `${sessionData.eventName} - ${sessionData.categoryName}`;
+            document.getElementById('summaryHeat2').textContent = sessionData.heat;
+            document.getElementById('summarySwimmers').textContent = Object.keys(sessionData.lanes).length;
+
+            const container = document.getElementById('timeEntry');
+            container.innerHTML = '';
+
+            for (let lane in sessionData.lanes) {
+                const laneData = sessionData.lanes[lane];
+                const laneDiv = document.createElement('div');
+                laneDiv.className = 'lane-item has-swimmer';
+                laneDiv.innerHTML = `
+                    <div class="lane-number">${lane}</div>
+                    <div class="lane-swimmer">${laneData.participantName}</div>
+                    <div></div>
+                    <div class="lane-time">
+                        <input type="number" step="0.01" min="0" max="500" 
+                            id="lane${lane}Time" placeholder="25.34"
+                            value="${laneData.time || ''}"
+                            onchange="updateLaneTime(${lane})">
+                    </div>
+                    <div class="lane-status">
+                        <select id="lane${lane}Status" onchange="updateLaneStatus(${lane})">
+                            <option value="OK">OK</option>
+                            <option value="DQ">DQ</option>
+                            <option value="DNS">DNS</option>
+                            <option value="DNF">DNF</option>
+                        </select>
+                    </div>
+                `;
+                container.appendChild(laneDiv);
+
+                // Restore if exists
+                if (laneData.status) {
+                    document.getElementById(`lane${lane}Status`).value = laneData.status;
+                    updateStatusClass(lane, laneData.status);
+                } else {
+                    updateStatusClass(lane, 'OK');
+                }
+            }
+        }
+
+        function updateLaneTime(lane) {
+            const time = parseFloat(document.getElementById(`lane${lane}Time`).value);
+            sessionData.lanes[lane].time = time;
+        }
+
+        function updateLaneStatus(lane) {
+            const status = document.getElementById(`lane${lane}Status`).value;
+            sessionData.lanes[lane].status = status;
+            updateStatusClass(lane, status);
+        }
+
+        function updateStatusClass(lane, status) {
+            const select = document.getElementById(`lane${lane}Status`);
+            select.className = `status-${status.toLowerCase()}`;
+        }
+
+        function prepareStep4() {
+            document.getElementById('summaryEvent3').textContent = `${sessionData.eventName} - ${sessionData.categoryName}`;
+            document.getElementById('summaryHeat3').textContent = sessionData.heat;
+
+            const container = document.getElementById('finalReview');
+            let html = '<table style="width: 100%; border-collapse: collapse;">';
+            html += '<thead><tr style="background: #2E7D32; color: white;">';
+            html += '<th style="padding: 10px;">Carril</th>';
+            html += '<th style="padding: 10px;">Nadador</th>';
+            html += '<th style="padding: 10px;">Tiempo</th>';
+            html += '<th style="padding: 10px;">Estado</th>';
+            html += '</tr></thead><tbody>';
+
+            for (let lane in sessionData.lanes) {
+                const laneData = sessionData.lanes[lane];
+                const status = laneData.status || 'OK';
+                const time = status === 'OK' ? (laneData.time || '-') : '-';
+                
+                html += `<tr style="border-bottom: 1px solid #e0e0e0;">`;
+                html += `<td style="padding: 10px; text-align: center; font-weight: bold;">${lane}</td>`;
+                html += `<td style="padding: 10px;">${laneData.participantName}</td>`;
+                html += `<td style="padding: 10px; text-align: center; font-weight: bold;">${time}s</td>`;
+                html += `<td style="padding: 10px; text-align: center;"><span style="padding: 5px 10px; border-radius: 4px; background: ${
+                    status === 'OK' ? '#D4EDDA' : status === 'DQ' ? '#F8D7DA' : status === 'DNS' ? '#E2E3E5' : '#FFF3CD'
+                }; color: ${
+                    status === 'OK' ? '#155724' : status === 'DQ' ? '#721c24' : status === 'DNS' ? '#383d41' : '#856404'
+                };">${status}</span></td>`;
+                html += `</tr>`;
+            }
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function saveResults() {
+            try {
+                // Validación final: verificar duplicados en este heat
+                const participantIds = Object.values(sessionData.lanes).map(l => l.participantId);
+                const duplicates = participantIds.filter((id, index) => participantIds.indexOf(id) !== index);
+                
+                if (duplicates.length > 0) {
+                    const dupNames = duplicates.map(id => {
+                        const p = window.allParticipants.find(p => p.participant_id === id);
+                        return p ? p.name : id;
+                    }).join(', ');
+                    
+                    alert(`❌ ERROR: Hay participantes duplicados en este heat:\n${dupNames}\n\nUn nadador no puede estar en dos carriles al mismo tiempo.`);
+                    return;
+                }
+
+                let savedCount = 0;
+                let warnings = [];
+
+                // Create entries and results
+                for (let lane in sessionData.lanes) {
+                    const laneData = sessionData.lanes[lane];
+                    
+                    // Create entry usando addEntry
+                    const entryResult = db.addEntry(
+                        sessionData.eventId,
+                        laneData.participantId,
+                        sessionData.heat,
+                        lane
+                    );
+                    
+                    // Verificar si hubo error
+                    if (entryResult.error) {
+                        warnings.push(`Carril ${lane}: ${entryResult.error}`);
+                        console.warn(`Advertencia carril ${lane}:`, entryResult.error);
+                        // Continuar - puede ser actualización
+                    }
+                    
+                    // Crear ID del entry para el resultado
+                    const entryId = `EN-${sessionData.eventId}-${laneData.participantId}-H${sessionData.heat}-L${lane}`;
+                    
+                    // Create result usando saveResult
+                    const status = laneData.status || 'OK';
+                    const timeSeconds = status === 'OK' ? laneData.time : null;
+                    
+                    db.saveResult(entryId, timeSeconds, status);
+                    savedCount++;
+                }
+
+                let message = `✅ ${savedCount} resultado(s) guardado(s) exitosamente`;
+                if (warnings.length > 0) {
+                    message += `\n\n⚠️ Advertencias:\n${warnings.join('\n')}`;
+                }
+                
+                alert(message);
+                document.getElementById('btnNextHeat').style.display = 'inline-block';
+                document.getElementById('btnNewEvent').style.display = 'inline-block';
+                
+                // Cerrar modal y recargar inscripciones
+                setTimeout(() => {
+                    cerrarModalCrearInscripcion();
+                }, 500);
+            } catch (error) {
+                console.error('Error al guardar resultados:', error);
+                alert(`❌ Error al guardar: ${error.message}`);
+            }
+        }
+
+        function saveAndNew() {
+            sessionData.heat++;
+            sessionData.lanes = {};
+            goToStep(2);
+            document.getElementById('heatNumber').value = sessionData.heat;
+        }
+
+        function resetWizard() {
+            sessionData = {
+                eventId: null,
+                eventName: null,
+                categoryId: null,
+                categoryName: null,
+                heat: 1,
+                lanes: {}
+            };
+            document.getElementById('heatNumber').value = 1;
+            document.getElementById('btnNextHeat').style.display = 'none';
+            document.getElementById('btnNewEvent').style.display = 'none';
+            goToStep(1);
+        }
+
+        // ========== FUNCIONES PARA GESTIONAR INSCRIPCIONES ==========
+        
+        let todasLasInscripciones = [];
+        let inscripcionesFiltradas = [];
+        
+        function mostrarModoGestionar() {
+            document.getElementById('modoDigitar').style.display = 'none';
+            document.getElementById('modoResultados').style.display = 'none';
+            document.getElementById('modoGestionar').style.display = 'block';
+            document.getElementById('btnModoGestionar').className = 'btn btn-primary';
+            document.getElementById('btnModoDigitar').className = 'btn';
+            document.getElementById('btnModoDigitar').style.background = '#1976D2';
+            document.getElementById('btnModoDigitar').style.color = 'white';
+            document.getElementById('btnModoResultados').className = 'btn';
+            document.getElementById('btnModoResultados').style.background = '#FF9800';
+            document.getElementById('btnModoResultados').style.color = 'white';
+            cargarInscripciones();
+        }
+        
+        function abrirModalCrearInscripcion() {
+            document.getElementById('modalCrearInscripcion').style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Evitar scroll del body
+            resetWizard(); // Resetear el wizard al abrir
+        }
+        
+        function cerrarModalCrearInscripcion() {
+            document.getElementById('modalCrearInscripcion').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restaurar scroll
+            cargarInscripciones(); // Recargar inscripciones por si se creó alguna
+        }
+        
+        function cargarInscripciones() {
+            console.log('📋 Cargando inscripciones...');
+            
+            const entries = db.getEntries();
+            todasLasInscripciones = [];
+            
+            entries.forEach(entry => {
+                const participant = db.getParticipantById(entry.participant_id);
+                const event = db.getEventById(entry.event_id);
+                const category = event ? db.getCategoryById(event.category_id) : null;
+                
+                if (participant && event && category) {
+                    todasLasInscripciones.push({
+                        entry_id: entry.entry_id,
+                        participant_id: entry.participant_id,
+                        participant_name: participant.name || participant.participant_name,
+                        club: participant.club || participant.club_or_team || '-',
+                        event_id: entry.event_id,
+                        event_name: event.event_name,
+                        category_id: category.category_id,
+                        category_name: category.category_name,
+                        heat: entry.heat || 0,
+                        lane: entry.lane || 0
+                    });
+                }
+            });
+            
+            console.log(`   Total inscripciones: ${todasLasInscripciones.length}`);
+            
+            // Cargar filtros
+            cargarFiltros();
+            
+            // Mostrar todas
+            filtrarInscripciones();
+        }
+        
+        // Función para normalizar texto (sin tildes, minúsculas)
+        function normalizarTexto(texto) {
+            return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        }
+
+        function cargarFiltros() {
+            // Categorías únicas
+            const categoriasMap = new Map();
+            todasLasInscripciones.forEach(i => {
+                if (!categoriasMap.has(i.category_id)) {
+                    categoriasMap.set(i.category_id, i.category_name);
+                }
+            });
+            
+            const selectCat = document.getElementById('filtroCategoria');
+            selectCat.innerHTML = '<option value="">-- Todas las categorías --</option>';
+            Array.from(categoriasMap.entries())
+                .sort((a, b) => a[1].localeCompare(b[1]))
+                .forEach(([id, name]) => {
+                    selectCat.innerHTML += `<option value="${id}">${name}</option>`;
+                });
+            
+            // Cargar todas las pruebas (se filtrarán dinámicamente)
+            actualizarFiltroPruebas();
+        }
+        
+        function actualizarFiltroPruebas() {
+            const categoriaSeleccionada = document.getElementById('filtroCategoria').value;
+            
+            // Pruebas únicas (eliminando duplicados por event_id)
+            const pruebasMap = new Map();
+            todasLasInscripciones.forEach(i => {
+                // Si hay categoría seleccionada, solo mostrar pruebas de esa categoría
+                if (categoriaSeleccionada && i.category_id !== categoriaSeleccionada) return;
+                
+                if (!pruebasMap.has(i.event_id)) {
+                    pruebasMap.set(i.event_id, {
+                        id: i.event_id,
+                        name: i.event_name,
+                        category: i.category_name
+                    });
+                }
+            });
+            
+            const selectPrueba = document.getElementById('filtroPrueba');
+            const pruebaActual = selectPrueba.value;
+            selectPrueba.innerHTML = '<option value="">-- Todas las pruebas --</option>';
+            
+            if (categoriaSeleccionada) {
+                // Si hay categoría seleccionada, mostrar solo pruebas de esa categoría
+                Array.from(pruebasMap.values())
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .forEach(prueba => {
+                        selectPrueba.innerHTML += `<option value="${prueba.id}">${prueba.name}</option>`;
+                    });
+            } else {
+                // Si no hay categoría, agrupar por categoría
+                const pruebasPorCategoria = new Map();
+                Array.from(pruebasMap.values()).forEach(prueba => {
+                    if (!pruebasPorCategoria.has(prueba.category)) {
+                        pruebasPorCategoria.set(prueba.category, []);
+                    }
+                    pruebasPorCategoria.get(prueba.category).push(prueba);
+                });
+                
+                // Agregar opciones agrupadas
+                Array.from(pruebasPorCategoria.entries())
+                    .sort((a, b) => a[0].localeCompare(b[0]))
+                    .forEach(([categoria, pruebas]) => {
+                        selectPrueba.innerHTML += `<optgroup label="${categoria}">`;
+                        pruebas.sort((a, b) => a.name.localeCompare(b.name))
+                              .forEach(prueba => {
+                                  selectPrueba.innerHTML += `<option value="${prueba.id}">${prueba.name}</option>`;
+                              });
+                        selectPrueba.innerHTML += `</optgroup>`;
+                    });
+            }
+            
+            // Restaurar selección anterior si existe
+            if (pruebaActual && selectPrueba.querySelector(`option[value="${pruebaActual}"]`)) {
+                selectPrueba.value = pruebaActual;
+            }
+            
+            // Actualizar filtro de heats también
+            actualizarFiltroHeats();
+        }
+        
+        function actualizarFiltroHeats() {
+            const categoriaSeleccionada = document.getElementById('filtroCategoria').value;
+            const pruebaSeleccionada = document.getElementById('filtroPrueba').value;
+            
+            // Heats únicos basados en los filtros actuales
+            const heatsSet = new Set();
+            todasLasInscripciones.forEach(i => {
+                // Aplicar filtros de categoría y prueba
+                if (categoriaSeleccionada && i.category_id !== categoriaSeleccionada) return;
+                if (pruebaSeleccionada && i.event_id !== pruebaSeleccionada) return;
+                
+                // Solo agregar heats asignados (mayores a 0)
+                if (i.heat > 0) {
+                    heatsSet.add(i.heat);
+                }
+            });
+            
+            const selectHeat = document.getElementById('filtroHeat');
+            const heatActual = selectHeat.value;
+            selectHeat.innerHTML = '<option value="">-- Todos los heats --</option>';
+            
+            // Agregar opción especial para "sin asignar"
+            selectHeat.innerHTML += '<option value="0">🔴 Sin asignar (Heat 0)</option>';
+            
+            // Agregar heats en orden numérico
+            Array.from(heatsSet)
+                .sort((a, b) => a - b)
+                .forEach(heat => {
+                    const count = todasLasInscripciones.filter(i => {
+                        if (categoriaSeleccionada && i.category_id !== categoriaSeleccionada) return false;
+                        if (pruebaSeleccionada && i.event_id !== pruebaSeleccionada) return false;
+                        return i.heat === heat;
+                    }).length;
+                    
+                    selectHeat.innerHTML += `<option value="${heat}">Heat ${heat} (${count} nadadores)</option>`;
+                });
+            
+            // Restaurar selección anterior si existe
+            if (heatActual && selectHeat.querySelector(`option[value="${heatActual}"]`)) {
+                selectHeat.value = heatActual;
+            }
+        }
+        
+        function filtrarInscripciones() {
+            // Actualizar filtro de pruebas cuando cambia la categoría
+            const categoriaAnterior = document.getElementById('filtroCategoria').dataset.anterior || '';
+            const categoriaActual = document.getElementById('filtroCategoria').value;
+            
+            if (categoriaAnterior !== categoriaActual) {
+                actualizarFiltroPruebas();
+                document.getElementById('filtroCategoria').dataset.anterior = categoriaActual;
+            }
+            
+            // Actualizar filtro de heats cuando cambia la categoría o prueba
+            const pruebaAnterior = document.getElementById('filtroPrueba').dataset.anterior || '';
+            const pruebaActual = document.getElementById('filtroPrueba').value;
+            
+            if (pruebaAnterior !== pruebaActual) {
+                actualizarFiltroHeats();
+                document.getElementById('filtroPrueba').dataset.anterior = pruebaActual;
+            }
+            
+            const filtroCategoria = document.getElementById('filtroCategoria').value;
+            const filtroPrueba = document.getElementById('filtroPrueba').value;
+            const filtroHeat = document.getElementById('filtroHeat').value;
+            const filtroBuscar = normalizarTexto(document.getElementById('filtroBuscar').value);
+            const filtroEstado = document.getElementById('filtroEstado').value;
+            
+            inscripcionesFiltradas = todasLasInscripciones.filter(inscripcion => {
+                if (filtroCategoria && inscripcion.category_id !== filtroCategoria) return false;
+                if (filtroPrueba && inscripcion.event_id !== filtroPrueba) return false;
+                if (filtroHeat !== '' && inscripcion.heat !== parseInt(filtroHeat)) return false;
+                if (filtroBuscar && !normalizarTexto(inscripcion.participant_name).includes(filtroBuscar)) return false;
+                if (filtroEstado === 'sinAsignar' && inscripcion.heat > 0 && inscripcion.lane > 0) return false;
+                if (filtroEstado === 'asignadas' && (inscripcion.heat == 0 || inscripcion.lane == 0)) return false;
+                return true;
+            });
+            
+            mostrarInscripciones();
+        }
+        
+        function mostrarInscripciones() {
+            const tbody = document.getElementById('tablaInscripcionesBody');
+            
+            if (inscripcionesFiltradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #999;">No se encontraron inscripciones con los filtros seleccionados</td></tr>';
+                document.getElementById('statsInscripciones').textContent = '0 inscripciones encontradas';
+                return;
+            }
+            
+            // Ordenar por categoría, prueba, heat, carril
+            inscripcionesFiltradas.sort((a, b) => {
+                if (a.category_name !== b.category_name) return a.category_name.localeCompare(b.category_name);
+                if (a.event_name !== b.event_name) return a.event_name.localeCompare(b.event_name);
+                if (a.heat !== b.heat) return a.heat - b.heat;
+                return a.lane - b.lane;
+            });
+            
+            let html = '';
+            let currentHeat = null;
+            
+            inscripcionesFiltradas.forEach(inscripcion => {
+                // Agregar separador de heat si cambia
+                if (currentHeat !== inscripcion.heat && inscripcion.heat > 0) {
+                    currentHeat = inscripcion.heat;
+                    html += `
+                        <tr style="background: #2E7D32; color: white;">
+                            <td colspan="7" style="padding: 10px; font-weight: bold; text-align: center;">
+                                🏊 HEAT ${currentHeat} - ${inscripcion.category_name} - ${inscripcion.event_name}
+                            </td>
+                        </tr>
+                    `;
+                }
+                
+                const sinAsignar = inscripcion.heat == 0 || inscripcion.lane == 0;
+                const rowClass = sinAsignar ? 'style="background: #FFF3E0;"' : '';
+                
+                html += `
+                    <tr ${rowClass}>
+                        <td style="font-weight: 600;">${inscripcion.participant_name}</td>
+                        <td>${inscripcion.club}</td>
+                        <td>${inscripcion.category_name}</td>
+                        <td>${inscripcion.event_name}</td>
+                        <td style="text-align: center;">
+                            <select id="heat_${inscripcion.entry_id}" 
+                                    style="width: 70px; padding: 5px; text-align: center; border: 2px solid ${sinAsignar ? '#FF9800' : '#2E7D32'}; border-radius: 4px; font-weight: bold;">
+                                <option value="0" ${inscripcion.heat == 0 ? 'selected' : ''}>-</option>
+                                ${Array.from({length: 20}, (_, i) => i + 1).map(h => 
+                                    `<option value="${h}" ${inscripcion.heat == h ? 'selected' : ''}>${h}</option>`
+                                ).join('')}
+                            </select>
+                        </td>
+                        <td style="text-align: center;">
+                            <select id="lane_${inscripcion.entry_id}" 
+                                    style="width: 70px; padding: 5px; text-align: center; border: 2px solid ${sinAsignar ? '#FF9800' : '#2E7D32'}; border-radius: 4px; font-weight: bold;">
+                                <option value="0" ${inscripcion.lane == 0 ? 'selected' : ''}>-</option>
+                                ${Array.from({length: 6}, (_, i) => i + 1).map(l => 
+                                    `<option value="${l}" ${inscripcion.lane == l ? 'selected' : ''}>${l}</option>`
+                                ).join('')}
+                            </select>
+                        </td>
+                        <td style="text-align: center; white-space: nowrap;">
+                            <button onclick="guardarCambiosInscripcion('${inscripcion.entry_id}')" 
+                                    class="btn btn-sm btn-success" style="margin-right: 5px;">
+                                ✅ Guardar
+                            </button>
+                            <button onclick="eliminarInscripcion('${inscripcion.entry_id}', '${inscripcion.participant_name}')" 
+                                    class="btn btn-sm" style="background: #D32F2F; color: white;">
+                                🗑️
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+            
+            // Estadísticas mejoradas
+            const sinAsignar = inscripcionesFiltradas.filter(i => i.heat == 0 || i.lane == 0).length;
+            const asignadas = inscripcionesFiltradas.length - sinAsignar;
+            
+            // Estadísticas por heat si hay un heat seleccionado
+            const filtroHeat = document.getElementById('filtroHeat').value;
+            let statsHeat = '';
+            
+            if (filtroHeat !== '' && inscripcionesFiltradas.length > 0) {
+                const heatNum = parseInt(filtroHeat);
+                const carrilesOcupados = new Set(inscripcionesFiltradas.map(i => i.lane).filter(l => l > 0));
+                const carrilesLibres = heatNum === 0 ? 0 : 6 - carrilesOcupados.size;
+                
+                statsHeat = ` | <strong>Heat ${heatNum}:</strong> ` +
+                           `<span style="color: #2196F3;">${carrilesOcupados.size} carriles ocupados</span>` +
+                           (carrilesLibres > 0 ? ` | <span style="color: #FF9800;">${carrilesLibres} carriles libres</span>` : '');
+            }
+            
+            document.getElementById('statsInscripciones').innerHTML = `
+                <strong>${inscripcionesFiltradas.length}</strong> inscripciones encontradas | 
+                <span style="color: #4CAF50;"><strong>${asignadas}</strong> asignadas</span> | 
+                <span style="color: #FF9800;"><strong>${sinAsignar}</strong> sin asignar</span>
+                ${statsHeat}
+            `;
+        }
+        
+        function guardarCambiosInscripcion(entryId) {
+            const heat = parseInt(document.getElementById(`heat_${entryId}`).value) || 0;
+            const lane = parseInt(document.getElementById(`lane_${entryId}`).value) || 0;
+            
+            const entries = db.getEntries();
+            const entry = entries.find(e => e.entry_id === entryId);
+            
+            if (entry) {
+                entry.heat = heat;
+                entry.lane = lane;
+                db.updateEntry(entry);
+                
+                alert('✅ Cambios guardados correctamente');
+                cargarInscripciones();
+            }
+        }
+        
+        function eliminarInscripcion(entryId, participantName) {
+            if (confirm(`¿Eliminar la inscripción de ${participantName}?\n\nEsta acción no se puede deshacer.`)) {
+                let entries = db.getEntries();
+                entries = entries.filter(e => e.entry_id !== entryId);
+                localStorage.setItem('entries', JSON.stringify(entries));
+                
+                alert('✅ Inscripción eliminada');
+                cargarInscripciones();
+            }
+        }
+
+        // ========== FUNCIONES PARA DIGITAR TIEMPOS ==========
+        
+        let nadadoresParaDigitar = [];
+        
+        function mostrarModoDigitar() {
+            document.getElementById('modoGestionar').style.display = 'none';
+            document.getElementById('modoDigitar').style.display = 'block';
+            document.getElementById('modoResultados').style.display = 'none';
+            
+            document.getElementById('btnModoGestionar').className = 'btn';
+            document.getElementById('btnModoGestionar').style.background = '#2E7D32';
+            document.getElementById('btnModoGestionar').style.color = 'white';
+            document.getElementById('btnModoDigitar').className = 'btn btn-primary';
+            document.getElementById('btnModoResultados').className = 'btn';
+            document.getElementById('btnModoResultados').style.background = '#FF9800';
+            document.getElementById('btnModoResultados').style.color = 'white';
+            
+            cargarCategoriasDigitar();
+        }
+        
+        function cargarCategoriasDigitar() {
+            const categories = db.getCategories();
+            const select = document.getElementById('digitarCategoria');
+            select.innerHTML = '<option value="">-- Selecciona una categoría --</option>';
+            categories.forEach(cat => {
+                select.innerHTML += `<option value="${cat.category_id}">${cat.category_name}</option>`;
+            });
+        }
+        
+        function actualizarPruebasDigitar() {
+            const categoryId = document.getElementById('digitarCategoria').value;
+            const selectPrueba = document.getElementById('digitarPrueba');
+            const selectHeat = document.getElementById('digitarHeat');
+            
+            selectPrueba.innerHTML = '<option value="">-- Selecciona una prueba --</option>';
+            selectHeat.innerHTML = '<option value="">-- Selecciona un heat --</option>';
+            document.getElementById('digitarContenedor').style.display = 'none';
+            
+            if (!categoryId) return;
+            
+            const events = db.getEvents().filter(e => e.category_id === categoryId);
+            events.forEach(event => {
+                selectPrueba.innerHTML += `<option value="${event.event_id}">${event.event_name}</option>`;
+            });
+        }
+        
+        function actualizarHeatsDigitar() {
+            const pruebaId = document.getElementById('digitarPrueba').value;
+            const selectHeat = document.getElementById('digitarHeat');
+            
+            selectHeat.innerHTML = '<option value="">-- Selecciona un heat --</option>';
+            document.getElementById('digitarContenedor').style.display = 'none';
+            
+            if (!pruebaId) return;
+            
+            // Obtener todos los heats únicos para esta prueba
+            const entries = db.getEntries().filter(e => e.event_id === pruebaId && e.heat > 0);
+            const heats = [...new Set(entries.map(e => e.heat))].sort((a, b) => a - b);
+            
+            heats.forEach(heat => {
+                selectHeat.innerHTML += `<option value="${heat}">Heat ${heat}</option>`;
+            });
+        }
+        
+        function cargarNadadoresParaDigitar() {
+            const pruebaId = document.getElementById('digitarPrueba').value;
+            const heat = document.getElementById('digitarHeat').value;
+            
+            if (!pruebaId || !heat) {
+                alert('⚠️ Selecciona una prueba y un heat');
+                return;
+            }
+            
+            // Obtener inscripciones para este heat
+            const entries = db.getEntries().filter(e => 
+                e.event_id === pruebaId && e.heat == heat
+            ).sort((a, b) => a.lane - b.lane);
+            
+            if (entries.length === 0) {
+                alert('⚠️ No hay nadadores inscritos en este heat');
+                return;
+            }
+            
+            nadadoresParaDigitar = [];
+            const tbody = document.getElementById('tablaDigitarBody');
+            let html = '';
+            
+            entries.forEach(entry => {
+                const participant = db.getParticipantById(entry.participant_id);
+                const result = db.getResults().find(r => r.entry_id === entry.entry_id);
+                
+                nadadoresParaDigitar.push({
+                    entry_id: entry.entry_id,
+                    participant_name: participant.name || participant.participant_name,
+                    club: participant.club || participant.club_or_team || '-',
+                    lane: entry.lane,
+                    time: result?.time || '',
+                    status: result?.status || 'OK'
+                });
+                
+                html += `
+                    <tr>
+                        <td style="text-align: center; font-weight: bold; font-size: 1.2em; color: #2E7D32;">${entry.lane}</td>
+                        <td style="font-weight: 600;">${participant.name || participant.participant_name}</td>
+                        <td>${participant.club || participant.club_or_team || '-'}</td>
+                        <td style="text-align: center;">
+                            <input type="text" 
+                                   id="tiempo_${entry.entry_id}" 
+                                   value="${result?.time || ''}" 
+                                   placeholder="00.00"
+                                   style="width: 100%; padding: 8px; text-align: center; border: 2px solid #2E7D32; border-radius: 4px; font-size: 1.1em; font-weight: bold;">
+                        </td>
+                        <td style="text-align: center;">
+                            <select id="estado_${entry.entry_id}" 
+                                    style="width: 100%; padding: 8px; border: 2px solid #2E7D32; border-radius: 4px; font-weight: bold;">
+                                <option value="OK" ${(!result || result.status === 'OK') ? 'selected' : ''}>✅ OK</option>
+                                <option value="DQ" ${result?.status === 'DQ' ? 'selected' : ''}>❌ DQ</option>
+                                <option value="DNS" ${result?.status === 'DNS' ? 'selected' : ''}>⊘ DNS</option>
+                                <option value="DNF" ${result?.status === 'DNF' ? 'selected' : ''}>⚠️ DNF</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+            document.getElementById('digitarContenedor').style.display = 'block';
+        }
+        
+        function guardarTodosLosTiempos() {
+            if (nadadoresParaDigitar.length === 0) {
+                alert('⚠️ No hay nadadores cargados');
+                return;
+            }
+            
+            let errores = [];
+            let guardados = 0;
+            
+            nadadoresParaDigitar.forEach(nadador => {
+                const tiempo = document.getElementById(`tiempo_${nadador.entry_id}`).value.trim();
+                const estado = document.getElementById(`estado_${nadador.entry_id}`).value;
+                
+                // Validar
+                if (estado === 'OK' && !tiempo) {
+                    errores.push(`${nadador.participant_name} (Carril ${nadador.lane}): Falta el tiempo`);
+                    return;
+                }
+                
+                if (tiempo && estado === 'OK' && (isNaN(parseFloat(tiempo)) || parseFloat(tiempo) <= 0)) {
+                    errores.push(`${nadador.participant_name} (Carril ${nadador.lane}): Tiempo inválido`);
+                    return;
+                }
+                
+                // Guardar o actualizar resultado usando saveResult
+                const timeSeconds = tiempo ? parseFloat(tiempo) : null;
+                db.saveResult(nadador.entry_id, timeSeconds, estado);
+                
+                guardados++;
+            });
+            
+            if (errores.length > 0) {
+                alert('❌ Errores encontrados:\n\n' + errores.join('\n'));
+                return;
+            }
+            
+            alert(`✅ ¡Tiempos guardados exitosamente!\n\n${guardados} resultados guardados`);
+            
+            // Recargar para mostrar los tiempos actualizados
+            cargarNadadoresParaDigitar();
+        }
+
+        // ========== FUNCIONES PARA ADMINISTRAR RESULTADOS ==========
+        
+        let allResultsAdmin = [];
+        let editingResultIdAdmin = null;
+        
+        function mostrarModoResultados() {
+            document.getElementById('modoGestionar').style.display = 'none';
+            document.getElementById('modoDigitar').style.display = 'none';
+            document.getElementById('modoResultados').style.display = 'block';
+            
+            document.getElementById('btnModoGestionar').className = 'btn';
+            document.getElementById('btnModoGestionar').style.background = '#2E7D32';
+            document.getElementById('btnModoGestionar').style.color = 'white';
+            document.getElementById('btnModoDigitar').className = 'btn';
+            document.getElementById('btnModoDigitar').style.background = '#1976D2';
+            document.getElementById('btnModoDigitar').style.color = 'white';
+            document.getElementById('btnModoResultados').className = 'btn btn-primary';
+            
+            loadAllResultsAdmin();
+            loadFilterOptionsResults();
+        }
+        
+        function loadFilterOptionsResults() {
+            const categories = db.getCategories();
+            const filterCategory = document.getElementById('filterCategoryResults');
+            filterCategory.innerHTML = '<option value="">-- Selecciona una categoría --</option>';
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.category_id;
+                option.textContent = cat.category_name;
+                filterCategory.appendChild(option);
+            });
+        }
+        
+        function updateEventFilterResults() {
+            const categoryId = document.getElementById('filterCategoryResults').value;
+            const filterEvent = document.getElementById('filterEventResults');
+            filterEvent.innerHTML = '<option value="">-- Selecciona una prueba --</option>';
+            
+            if (categoryId) {
+                const events = db.getEvents().filter(e => e.category_id === categoryId);
+                events.forEach(evt => {
+                    const option = document.createElement('option');
+                    option.value = evt.event_id;
+                    option.textContent = evt.event_name;
+                    filterEvent.appendChild(option);
+                });
+            }
+        }
+        
+        function filterByEventResults() {
+            const eventId = document.getElementById('filterEventResults').value;
+            
+            if (!eventId) {
+                displayResultsAdmin([]);
+                document.getElementById('resultsBodyAdmin').innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: #999;">Selecciona una prueba para ver sus resultados</td></tr>';
+                return;
+            }
+            
+            const filtered = allResultsAdmin.filter(r => r.event_id === eventId);
+            
+            // Ordenar por heat y luego por posición
+            filtered.sort((a, b) => {
+                if (a.heat_number !== b.heat_number) {
+                    return a.heat_number - b.heat_number;
+                }
+                if (a.position !== '-' && b.position !== '-') {
+                    return a.position - b.position;
+                }
+                return 0;
+            });
+            
+            displayResultsAdmin(filtered);
+        }
+        
+        function loadAllResultsAdmin() {
+            const entries = db.getEntries();
+            allResultsAdmin = [];
+            
+            entries.forEach(entry => {
+                const participant = db.getParticipantById(entry.participant_id);
+                const event = db.getEventById(entry.event_id);
+                const category = event ? db.getCategoryById(event.category_id) : null;
+                
+                if (participant && event && category) {
+                    let time = entry.time || null;
+                    let status = entry.status || 'OK';
+                    
+                    if (!time) {
+                        const result = db.getResultByEntryId(entry.entry_id);
+                        if (result) {
+                            time = result.time_seconds;
+                            status = result.status || status;
+                        }
+                    }
+                    
+                    allResultsAdmin.push({
+                        entry_id: entry.entry_id,
+                        category_name: category.category_name,
+                        category_id: category.category_id,
+                        event_name: event.event_name,
+                        event_id: event.event_id,
+                        heat_number: entry.heat || entry.heat_number || '-',
+                        lane_number: entry.lane || entry.lane_number || '-',
+                        participant_name: participant.name || participant.participant_name || 'Sin nombre',
+                        participant_id: participant.participant_id,
+                        time: time,
+                        status: status,
+                        position: '-'
+                    });
+                }
+            });
+            
+            calculatePositionsAdmin();
+            displayResultsAdmin(allResultsAdmin);
+            updateStatisticsAdmin();
+        }
+        
+        function calculatePositionsAdmin() {
+            const eventGroups = {};
+            allResultsAdmin.forEach(result => {
+                if (!eventGroups[result.event_id]) {
+                    eventGroups[result.event_id] = [];
+                }
+                eventGroups[result.event_id].push(result);
+            });
+            
+            Object.keys(eventGroups).forEach(eventId => {
+                const results = eventGroups[eventId]
+                    .filter(r => r.status === 'OK' && r.time)
+                    .sort((a, b) => parseFloat(a.time) - parseFloat(b.time));
+                
+                results.forEach((result, index) => {
+                    result.position = index + 1;
+                });
+            });
+        }
+        
+        function displayResultsAdmin(results) {
+            const tbody = document.getElementById('resultsBodyAdmin');
+            
+            if (results.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: #999;">Selecciona una prueba para ver sus resultados</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            let currentHeat = null;
+            
+            results.forEach(result => {
+                if (currentHeat !== result.heat_number) {
+                    currentHeat = result.heat_number;
+                    
+                    // Verificar si hay múltiples pruebas en este heat
+                    const heatsResults = results.filter(r => r.heat_number === currentHeat);
+                    const uniqueEvents = new Set(heatsResults.map(r => r.event_name));
+                    const uniqueCategories = new Set(heatsResults.map(r => r.category_name));
+                    
+                    let heatTitle = '';
+                    if (uniqueEvents.size === 1) {
+                        // Solo una prueba en este heat
+                        heatTitle = `🏊 HEAT ${currentHeat} - ${result.event_name}`;
+                    } else if (uniqueCategories.size === 1) {
+                        // Múltiples pruebas pero misma categoría
+                        heatTitle = `🏊 HEAT ${currentHeat} - ${result.category_name}`;
+                    } else {
+                        // Múltiples pruebas y categorías
+                        heatTitle = `🏊 HEAT ${currentHeat}`;
+                    }
+                    
+                    html += `
+                        <tr style="background: #2E7D32; color: white;">
+                            <td colspan="9" style="padding: 10px; font-weight: bold; text-align: center;">
+                                ${heatTitle}
+                            </td>
+                        </tr>
+                    `;
+                }
+                
+                const statusBadge = getStatusBadgeAdmin(result.status);
+                const timeDisplay = result.time ? parseFloat(result.time).toFixed(2) + 's' : '-';
+                const positionDisplay = result.status === 'OK' && result.position && result.position !== '-' ? 
+                    `🏅 ${result.position}°` : '-';
+                
+                html += `
+                    <tr id="row-admin-${result.entry_id}">
+                        <td><strong>${result.participant_name}</strong></td>
+                        <td>${result.category_name}</td>
+                        <td>${result.event_name}</td>
+                        <td style="text-align: center; font-weight: bold; color: #2E7D32;">${result.heat_number}</td>
+                        <td style="text-align: center; font-weight: bold; color: #2E7D32;">${result.lane_number}</td>
+                        <td style="font-weight: bold; color: #1976D2; font-size: 1.1em;">${timeDisplay}</td>
+                        <td>${statusBadge}</td>
+                        <td style="text-align: center; font-weight: bold; font-size: 1.1em;">${positionDisplay}</td>
+                        <td style="white-space: nowrap;">
+                            <button onclick="editResultAdmin('${result.entry_id}')" class="btn btn-sm" style="background: #FF9800; color: white; margin-right: 5px;">
+                                ✏️ Editar
+                            </button>
+                            <button onclick="deleteResultAdmin('${result.entry_id}')" class="btn btn-sm btn-danger">
+                                🗑️
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        function getStatusBadgeAdmin(status) {
+            const badges = {
+                'OK': '<span class="status-badge status-ok">✅ OK</span>',
+                'DQ': '<span class="status-badge status-dq">❌ DQ</span>',
+                'DNS': '<span class="status-badge status-dns">⊘ DNS</span>',
+                'DNF': '<span class="status-badge status-dnf">⚠️ DNF</span>'
+            };
+            return badges[status] || badges['OK'];
+        }
+        
+        function editResultAdmin(entryId) {
+            if (editingResultIdAdmin) {
+                alert('⚠️ Ya estás editando otro resultado. Guarda o cancela primero.');
+                return;
+            }
+            
+            editingResultIdAdmin = entryId;
+            const result = allResultsAdmin.find(r => r.entry_id === entryId);
+            const row = document.getElementById(`row-admin-${entryId}`);
+            
+            row.classList.add('edit-row');
+            row.innerHTML = `
+                <td>${result.participant_name}</td>
+                <td>${result.category_name}</td>
+                <td>${result.event_name}</td>
+                <td style="text-align: center;">${result.heat_number}</td>
+                <td style="text-align: center;">
+                    <select id="edit-lane-admin-${entryId}" class="edit-input" style="max-width: 70px; font-weight: bold; text-align: center;">
+                        ${Array.from({length: 6}, (_, i) => i + 1).map(l => 
+                            `<option value="${l}" ${result.lane_number == l ? 'selected' : ''}>${l}</option>`
+                        ).join('')}
+                    </select>
+                </td>
+                <td>
+                    <input type="text" id="edit-time-admin-${entryId}" class="edit-input" value="${result.time || ''}" placeholder="00.00">
+                </td>
+                <td>
+                    <select id="edit-status-admin-${entryId}" class="edit-select">
+                        <option value="OK" ${result.status === 'OK' ? 'selected' : ''}>✅ OK</option>
+                        <option value="DQ" ${result.status === 'DQ' ? 'selected' : ''}>❌ DQ</option>
+                        <option value="DNS" ${result.status === 'DNS' ? 'selected' : ''}>⊘ DNS</option>
+                        <option value="DNF" ${result.status === 'DNF' ? 'selected' : ''}>⚠️ DNF</option>
+                    </select>
+                </td>
+                <td style="text-align: center;">-</td>
+                <td style="white-space: nowrap;">
+                    <button onclick="saveEditAdmin('${entryId}')" class="save-edit-btn" style="margin-right: 5px;">
+                        💾 Guardar
+                    </button>
+                    <button onclick="cancelEditAdmin('${entryId}')" class="cancel-edit-btn">
+                        ❌ Cancelar
+                    </button>
+                </td>
+            `;
+        }
+        
+        function saveEditAdmin(entryId) {
+            const newLane = document.getElementById(`edit-lane-admin-${entryId}`).value;
+            const newTime = document.getElementById(`edit-time-admin-${entryId}`).value;
+            const newStatus = document.getElementById(`edit-status-admin-${entryId}`).value;
+            
+            if (!newLane || parseInt(newLane) < 1) {
+                alert('⚠️ El carril debe ser válido (mínimo 1)');
+                return;
+            }
+            
+            if (newStatus === 'OK' && !newTime) {
+                alert('⚠️ Si el estado es OK, debe haber un tiempo');
+                return;
+            }
+            
+            const entry = db.getEntryById(entryId);
+            if (entry) {
+                entry.lane = parseInt(newLane);
+                entry.time = newTime ? parseFloat(newTime) : null;
+                entry.status = newStatus;
+                
+                db.updateEntry(entry);
+                
+                if (newTime && newStatus === 'OK') {
+                    db.saveResult(entryId, parseFloat(newTime), newStatus);
+                }
+                
+                editingResultIdAdmin = null;
+                loadAllResultsAdmin();
+            }
+        }
+        
+        function cancelEditAdmin(entryId) {
+            editingResultIdAdmin = null;
+            loadAllResultsAdmin();
+        }
+        
+        function deleteResultAdmin(entryId) {
+            if (!confirm('⚠️ ¿Estás seguro de eliminar este resultado? Esta acción no se puede deshacer.')) {
+                return;
+            }
+            
+            db.deleteEntry(entryId);
+            loadAllResultsAdmin();
+        }
+        
+        function updateStatisticsAdmin() {
+            document.getElementById('totalResultsAdmin').textContent = allResultsAdmin.length;
+            
+            const uniqueEvents = new Set(allResultsAdmin.map(r => r.event_id));
+            document.getElementById('totalEventsAdmin').textContent = uniqueEvents.size;
+            
+            const uniqueParticipants = new Set(allResultsAdmin.map(r => r.participant_id));
+            document.getElementById('totalParticipantsAdmin').textContent = uniqueParticipants.size;
+        }
+
+        // Init on load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+    
+    </div> <!-- Cierre de modoCrear -->
+
+    <!-- Footer -->
+    <footer style="background: linear-gradient(135deg, #2E7D32, #1B5E20); color: white; padding: 30px 20px; margin-top: 40px; text-align: center;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <h3 style="margin: 0 0 10px 0; font-size: 1.5em;">🏊 Olimpiadas Río de Oro 2025</h3>
+            <p style="margin: 5px 0; opacity: 0.9;">Sistema de Gestión de Competencias de Natación</p>
+            <p style="margin: 5px 0; opacity: 0.8; font-size: 0.9em;">📅 2 de Noviembre, 2025 | 👥 96 Participantes | 🏆 9 Categorías</p>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.3);">
+                <p style="margin: 0; font-size: 0.85em; opacity: 0.7;">Desarrollado con ❤️ para la comunidad deportiva</p>
+            </div>
+        </div>
+    </footer>
+    
+</body>
+</html>

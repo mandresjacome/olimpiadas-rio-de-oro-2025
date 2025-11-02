@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Olimpiadas Río de Oro 2025 - Información Oficial</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .event-header {
+            background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .event-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+        }
+        
+        .event-header .motto {
+            font-style: italic;
+            opacity: 0.95;
+            font-size: 1.1em;
+            margin-top: 15px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #2E7D32;
+        }
+        
+        .info-card h3 {
+            margin: 0 0 15px 0;
+            color: #2E7D32;
+            font-size: 1.3em;
+        }
+        
+        .info-card p {
+            margin: 8px 0;
+            color: #666;
+        }
+        
+        .event-section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .event-section h2 {
+            margin: 0 0 20px 0;
+            color: #2E7D32;
+            border-bottom: 3px solid #2E7D32;
+            padding-bottom: 10px;
+        }
+        
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .schedule-table th,
+        .schedule-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .schedule-table th {
+            background: #2E7D32;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .schedule-table tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .category-card {
+            background: #E8F5E9;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 3px solid #2E7D32;
+        }
+        
+        .category-card h4 {
+            margin: 0 0 5px 0;
+            color: #2E7D32;
+        }
+        
+        .category-card p {
+            margin: 0;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .price-card {
+            background: #FFF3E0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #E64A19;
+        }
+        
+        .price-card h4 {
+            margin: 0 0 10px 0;
+            color: #E64A19;
+        }
+        
+        .price-option {
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        
+        .price-option strong {
+            color: #E64A19;
+            font-size: 1.1em;
+        }
+        
+        .contact-card {
+            background: #E8F5E9;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #2E7D32;
+        }
+        
+        .contact-card h4 {
+            margin: 0 0 10px 0;
+            color: #1B5E20;
+        }
+        
+        .rules-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .rules-list li {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #f5f5f5;
+            border-left: 3px solid #2E7D32;
+            border-radius: 4px;
+        }
+        
+        .rules-list li:before {
+            content: "✓ ";
+            color: #2E7D32;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📋 Información Oficial del Evento</h1>
+        <p>Olimpiadas Río de Oro 2025</p>
+    </div>
+
+    <div class="container">
+        <!-- Navigation Menu -->
+        <div class="nav-menu">
+            <a href="public-view.html" class="nav-btn success">
+                📊 Resultados
+            </a>
+            <a href="event-info.html" class="nav-btn primary">
+                ℹ️ Info del Evento
+            </a>
+        </div>
+
+        <!-- Event Header -->
+        <div class="event-header">
+            <h1>🏊 Olimpiadas Río de Oro 2025</h1>
+            <h3>Primera Versión</h3>
+            <p style="font-size: 1.2em; margin-top: 15px;">
+                <strong>Club Deportivo SPORTLAND</strong><br>
+                Piedecuesta, Santander
+            </p>
+            <p class="motto">"El deporte nos une, el orgullo piedecuestano nos identifica"</p>
+        </div>
+
+        <!-- Basic Information -->
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>📅 Fecha y Hora</h3>
+                <p><strong>Fecha:</strong> Domingo, 2 de noviembre de 2025</p>
+                <p><strong>Hora:</strong> 7:00 a.m. - 5:00 p.m.</p>
+                <p><strong>Calentamiento:</strong> 7:00 AM</p>
+                <p><strong>Inicio Competencias:</strong> 7:30 AM</p>
+            </div>
+
+            <div class="info-card">
+                <h3>📍 Lugar</h3>
+                <p><strong>Parque Recreacional</strong></p>
+                <p>Guatiguará, Piedecuesta</p>
+                <p>Santander, Colombia</p>
+            </div>
+
+            <div class="info-card">
+                <h3>🏢 Organiza</h3>
+                <p><strong>Club Deportivo SPORTLAND</strong></p>
+                <p>Con el apoyo de la Asociación de Padres de Familia</p>
+                <p>Municipio de Piedecuesta</p>
+            </div>
+        </div>
+
+        <!-- Schedule -->
+        <div class="event-section">
+            <h2>⏰ Programación del Día</h2>
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>Hora</th>
+                        <th>Actividad / Grupo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>6:30 AM</td>
+                        <td>Llegada Comité Organizador</td>
+                    </tr>
+                    <tr>
+                        <td>7:00 AM</td>
+                        <td>🏃 Atletas ACUATHLON</td>
+                    </tr>
+                    <tr>
+                        <td>8:30 AM</td>
+                        <td>🏊 Atletas MAYORES DE 7 AÑOS - FESTI-TORNEO DE NATACIÓN</td>
+                    </tr>
+                    <tr>
+                        <td>9:00 AM</td>
+                        <td>👶 Atletas 3 A 6 AÑOS - FESTIVAL BEBES</td>
+                    </tr>
+                    <tr>
+                        <td>11:30 AM</td>
+                        <td>💪 Atletas CIRCUITO CAPACIDAD CARDIO-MUSCULAR</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Swimming Categories -->
+        <div class="event-section">
+            <h2>🏊 Categorías de Natación</h2>
+            <div class="category-grid">
+                <div class="category-card">
+                    <h4>BEBES</h4>
+                    <p>3-6 años</p>
+                    <p><small>2019-2022</small></p>
+                </div>
+                <div class="category-card">
+                    <h4>MENORES</h4>
+                    <p>7-9 años</p>
+                    <p><small>2016-2018</small></p>
+                </div>
+                <div class="category-card">
+                    <h4>INFANTIL A</h4>
+                    <p>10-11 años</p>
+                    <p><small>2014-2015</small></p>
+                </div>
+                <div class="category-card">
+                    <h4>INFANTIL B</h4>
+                    <p>12-13 años</p>
+                    <p><small>2012-2013</small></p>
+                </div>
+                <div class="category-card">
+                    <h4>JUVENIL A</h4>
+                    <p>14-15 años</p>
+                    <p><small>2010-2011</small></p>
+                </div>
+                <div class="category-card">
+                    <h4>JUVENIL B</h4>
+                    <p>16-17 años</p>
+                    <p><small>2008-2009</small></p>
+                </div>
+                <div class="category-card">
+                    <h4>MAYORES</h4>
+                    <p>18-30 años</p>
+                    <p><small>1995-2007</small></p>
+                </div>
+                <div class="category-card">
+                    <h4>MASTER</h4>
+                    <p>31+ años</p>
+                    <p><small>1994 y anteriores</small></p>
+                </div>
+                <div class="category-card">
+                    <h4>NOVATOS</h4>
+                    <p>Sin importar edad</p>
+                    <p><small>Todas las edades</small></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events Description -->
+        <div class="event-section">
+            <h2>🏆 Eventos Principales</h2>
+            
+            <h3 style="color: #2E7D32; margin-top: 20px;">1️⃣ ACUATHLON (Participativo)</h3>
+            <p><strong>Combina atletismo y natación</strong></p>
+            <ul>
+                <li><strong>NOVATOS:</strong> 1200 metros atletismo + 500 metros natación</li>
+                <li><strong>INTERMEDIOS:</strong> 2000 metros atletismo + 1000 metros natación</li>
+                <li><strong>AVANZADOS:</strong> 3200 metros atletismo + 1500 metros natación</li>
+            </ul>
+
+            <h3 style="color: #2E7D32; margin-top: 25px;">2️⃣ FESTI-TORNEO DE NATACIÓN</h3>
+            <p><strong>Pruebas según categoría:</strong></p>
+            
+            <div style="margin: 15px 0;">
+                <h4 style="color: #1B5E20;">BEBES (3-6 años)</h4>
+                <ul>
+                    <li>25M Badeo</li>
+                    <li>Búsqueda del Tesoro</li>
+                    <li>10M Caballito</li>
+                </ul>
+            </div>
+
+            <div style="margin: 15px 0;">
+                <h4 style="color: #1B5E20;">MENORES (7-9 años)</h4>
+                <ul>
+                    <li>25M Patada Crol o Libre</li>
+                    <li>25M Crol o Libre</li>
+                    <li>25M Espalda</li>
+                </ul>
+            </div>
+
+            <div style="margin: 15px 0;">
+                <h4 style="color: #1B5E20;">INFANTIL A, B / JUVENIL A, B (10-17 años)</h4>
+                <ul>
+                    <li>25M Apnea Subacuático de Mariposa</li>
+                    <li>100M Estilo Libre o Crol</li>
+                    <li>100M Combinado Individual</li>
+                </ul>
+            </div>
+
+            <div style="margin: 15px 0;">
+                <h4 style="color: #1B5E20;">MAYORES / MASTER (18+ años)</h4>
+                <ul>
+                    <li>25M Estilo Libre o Crol</li>
+                    <li>50M Estilo Libre o Crol</li>
+                    <li>50M Combinado Individual</li>
+                </ul>
+            </div>
+
+            <div style="margin: 15px 0;">
+                <h4 style="color: #1B5E20;">NOVATOS (Todas las edades)</h4>
+                <ul>
+                    <li>25M Patada Crol</li>
+                    <li>25M Crol</li>
+                    <li>25M Espalda</li>
+                </ul>
+                <p style="background: #FFF3E0; padding: 10px; border-radius: 4px; margin-top: 10px;">
+                    <strong>⚠️ Categoría Novatos:</strong> Diseñada para quienes están iniciando en la natación.
+                    En las pruebas de patada o caballito se debe usar tabla flotadora o gusano.
+                </p>
+            </div>
+
+            <h3 style="color: #2E7D32; margin-top: 25px;">3️⃣ CIRCUITO CAPACIDAD CARDIO-MUSCULAR</h3>
+            <p><strong>Orden del circuito:</strong></p>
+            <ol>
+                <li>Remo en TRX</li>
+                <li>Cargadas</li>
+                <li>Flexiones</li>
+                <li>Natación</li>
+            </ol>
+            <p style="background: #E3F2FD; padding: 10px; border-radius: 4px; margin-top: 10px;">
+                <strong>⏱️ Importante:</strong> Entre cada ejercicio tendrás 30 segundos de recuperación.
+                Cada repetición debe hacerse con el recorrido completo de la articulación.
+            </p>
+
+            <table class="schedule-table" style="margin-top: 15px;">
+                <thead>
+                    <tr>
+                        <th>Categoría</th>
+                        <th>Remo TRX</th>
+                        <th>Cargadas</th>
+                        <th>Flexiones</th>
+                        <th>Natación</th>
+                        <th>Implemento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>NOVATOS</td>
+                        <td>25"/30"</td>
+                        <td>25"/30"</td>
+                        <td>25"/30"</td>
+                        <td>2'30"</td>
+                        <td>Balón 7 kg</td>
+                    </tr>
+                    <tr>
+                        <td>INTERMEDIOS</td>
+                        <td>50"/30"</td>
+                        <td>50"/30"</td>
+                        <td>50"/30"</td>
+                        <td>3'</td>
+                        <td>Balón 10 kg</td>
+                    </tr>
+                    <tr>
+                        <td>AVANZADOS</td>
+                        <td>1m/30"</td>
+                        <td>1m/30"</td>
+                        <td>1m/30"</td>
+                        <td>4'</td>
+                        <td>Balón 10 kg</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pricing -->
+        <div class="event-section">
+            <h2>💰 Inversión y Beneficios</h2>
+            
+            <div class="price-card">
+                <h4>👶 Categoría BEBES (3-6 años)</h4>
+                <div class="price-option">
+                    <strong>$65.000</strong> → Incluye inscripción, medalla de participación y obsequio.
+                </div>
+                <div class="price-option">
+                    <strong>$100.000</strong> → Incluye inscripción, medalla de participación, obsequio y camiseta oficial.
+                </div>
+            </div>
+
+            <div class="price-card">
+                <h4>🏊 Categorías 7-9 años y NOVATOS</h4>
+                <div class="price-option">
+                    <strong>$35.000</strong> → Incluye inscripción y medalla de participación.
+                </div>
+                <div class="price-option">
+                    <strong>$80.000</strong> → Incluye inscripción, medalla de participación y camiseta oficial.
+                </div>
+            </div>
+
+            <div class="price-card">
+                <h4>🏆 Categorías INFANTIL A MASTER</h4>
+                <div class="price-option">
+                    <strong>$50.000</strong> → Incluye inscripción y medalla de participación por evento.
+                </div>
+                <div class="price-option">
+                    <strong>$65.000</strong> → Incluye inscripción y medalla del 1º al 5º puesto.
+                </div>
+                <div class="price-option">
+                    <strong>$100.000</strong> → Incluye inscripción, medalla del 1º al 5º puesto y camiseta oficial.
+                </div>
+            </div>
+
+            <div style="background: #FFF3CD; padding: 15px; border-radius: 6px; border-left: 4px solid #FFC107; margin-top: 15px;">
+                <strong>⚠️ FECHAS LÍMITE DE INSCRIPCIÓN:</strong>
+                <ul>
+                    <li>Con camiseta: 22 de octubre de 2025</li>
+                    <li>Sin camiseta: 29 de octubre de 2025</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Important Rules -->
+        <div class="event-section">
+            <h2>📋 Recomendaciones Técnicas Importantes</h2>
+            <ul class="rules-list">
+                <li>Participación mínima: 10 afiliados o personas naturales para que pueda realizarse el evento.</li>
+                <li>Evento participativo que busca exaltar el esfuerzo y la dedicación de los deportistas.</li>
+                <li>El mínimo de edad para participar en este evento es de 3 años.</li>
+                <li>Es necesaria la preparación física y psicológica para la realización de estas pruebas de resistencia.</li>
+                <li>No se permitirá la participación a ningún deportista bajo efectos de sustancias alucinógenas o alcohol.</li>
+                <li>Todos los participantes deberán llevar su documento de identidad y carné de seguro médico.</li>
+                <li>Los deportistas menores de 18 años deberán ir acompañados de un adulto responsable.</li>
+                <li>Cada deportista deberá contar con los implementos necesarios para la presentación de cada evento.</li>
+                <li>La carrera se podrá ejecutar de la forma más conveniente que considere el deportista.</li>
+                <li>Todos los participantes deberán diligenciar el formato de exoneración de responsabilidad.</li>
+            </ul>
+
+            <div style="background: #E3F2FD; padding: 15px; border-radius: 6px; margin-top: 20px;">
+                <h4 style="color: #2E7D32; margin: 0 0 10px 0;">🏊 Reglas Especiales para Categoría NOVATOS</h4>
+                <ul>
+                    <li><strong>Implementos obligatorios:</strong> Tabla flotadora o gusano en pruebas de patada o caballito</li>
+                    <li><strong>Prueba de apnea:</strong> Mantente bajo el agua todo lo que puedas. Puedes salir y sumergirte otra vez</li>
+                    <li><strong>Ganador apnea:</strong> Quien recorra la distancia en menos tiempo, cuidando posición flecha y ondulación tipo mariposa</li>
+                </ul>
+            </div>
+
+            <div style="background: #FFF3E0; padding: 15px; border-radius: 6px; margin-top: 15px;">
+                <h4 style="color: #E65100; margin: 0 0 10px 0;">👶 Reglas Especiales para Categoría BEBES</h4>
+                <ul>
+                    <li><strong>Modalidad:</strong> Harán la prueba uno por uno, sin competir directamente con otros</li>
+                    <li><strong>Objetivo:</strong> La meta es dar su máxima velocidad personal, no enfrentar a sus compañeros</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="event-section">
+            <h2>📞 Contacto e Información</h2>
+            
+            <div class="contact-card">
+                <h4>👨‍💼 Director General del Evento</h4>
+                <p style="margin: 0;"><strong>Edinson González Bueno</strong></p>
+                <p style="margin: 5px 0 0 0;">📱 317 270 5307</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px;">
+                <div class="contact-card">
+                    <h4>Aura Sandoval</h4>
+                    <p style="margin: 0;">📱 316 563 8725</p>
+                </div>
+                <div class="contact-card">
+                    <h4>Marta Carrillo</h4>
+                    <p style="margin: 0;">📱 316 637 4768</p>
+                </div>
+            </div>
+
+            <div style="background: #E3F2FD; padding: 20px; border-radius: 8px; margin-top: 20px; text-align: center;">
+                <h3 style="color: #2E7D32; margin: 0 0 15px 0;">🏊 ¡Te Esperamos!</h3>
+                <p style="margin: 0; font-size: 1.1em; color: #1B5E20; font-weight: 600;">
+                    "El deporte nos une, el orgullo piedecuestano nos identifica"
+                </p>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    Club Deportivo SPORTLAND - Piedecuesta, Santander
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/database.js"></script>
+    <script src="js/event-data.js"></script>
+
+    <!-- Footer -->
+    <footer style="background: linear-gradient(135deg, #2E7D32, #1B5E20); color: white; padding: 30px 20px; margin-top: 40px; text-align: center;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <h3 style="margin: 0 0 10px 0; font-size: 1.5em;">🏊 Olimpiadas Río de Oro 2025</h3>
+            <p style="margin: 5px 0; opacity: 0.9;">Sistema de Gestión de Competencias de Natación</p>
+            <p style="margin: 5px 0; opacity: 0.8; font-size: 0.9em;">📅 2 de Noviembre, 2025 | 👥 96 Participantes | 🏆 9 Categorías</p>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.3);">
+                <p style="margin: 0; font-size: 0.85em; opacity: 0.7;">Desarrollado con ❤️ para la comunidad deportiva</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

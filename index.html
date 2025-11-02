@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Competencia de Natación</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(156,39,176,0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 6px 25px rgba(255,64,129,0.6); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>🏊‍♂️ Sistema de Competencia de Natación</h1>
+        <p>Gestión completa de eventos, participantes y resultados</p>
+    </div>
+
+    <div class="container">
+        <!-- Navigation Menu -->
+        <div class="nav-menu">
+            <a href="index.html" class="nav-btn primary">
+                📋 Dashboard
+            </a>
+            <a href="control-panel.html" class="nav-btn">
+                🎮 Panel de Control
+            </a>
+            <a href="admin-results.html" class="nav-btn" style="background: #FF9800; display: none;">
+                🔧 Administrar Resultados
+            </a>
+            <a href="public-view.html" class="nav-btn success">
+                📊 Resultados Públicos
+            </a>
+            <button onclick="DataExporter.exportJSON()" class="nav-btn secondary" style="display: none;">
+                💾 Backup
+            </button>
+            <button onclick="showImportModal()" class="nav-btn secondary" style="display: none;">
+                📥 Importar
+            </button>
+            <button onclick="limpiarEventosDuplicados()" class="nav-btn" style="background: #FF9800; color: white; display: none;">
+                🧹 Limpiar Duplicados
+            </button>
+        </div>
+
+        <!-- Panel de Ayuda e Instrucciones (Desplegable) -->
+        <div class="card" style="background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%); border-left: 5px solid #4CAF50;">
+            <div class="card-header" style="background: transparent; border-bottom: 2px solid #4CAF50; cursor: pointer;" onclick="toggleHelpPanel()">
+                <h2 style="color: #2E7D32; display: flex; align-items: center; justify-content: space-between;">
+                    <span>💡 Guía de Uso - Configuración del Evento</span>
+                    <span id="helpPanelToggle" style="font-size: 1.5em; transition: transform 0.3s; transform: rotate(-90deg);">▶</span>
+                </h2>
+            </div>
+            <div id="helpPanelContent" style="padding: 20px; display: none;">
+                <p style="font-size: 1.1em; margin-bottom: 20px; color: #1B5E20;">
+                    <strong>Bienvenido al Panel de Configuración</strong> - Aquí puedes preparar todo para las Olimpiadas Río de Oro 2025
+                </p>
+
+                <!-- Botones de Acción Rápida -->
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 3px solid #4CAF50;">
+                    <h3 style="color: #2E7D32; margin-top: 0; text-align: center;">🚀 Acciones Rápidas</h3>
+                    <div style="display: grid; gap: 15px;">
+                        <!-- Configurar Todo -->
+                        <div style="background: linear-gradient(135deg, #F3E5F5, #E1BEE7); padding: 15px; border-radius: 8px; border-left: 5px solid #9C27B0;">
+                            <button onclick="configurarEventoCompleto()" style="width: 100%; background: linear-gradient(135deg, #FF4081, #9C27B0); color: white; font-weight: bold; font-size: 1.1em; padding: 15px 25px; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(156,39,176,0.4); animation: pulse 2s infinite; margin-bottom: 10px;">
+                                ⚡ CONFIGURAR TODO AUTOMÁTICAMENTE ⚡
+                            </button>
+                            <p style="margin: 5px 0; line-height: 1.6; color: #4A148C;">
+                                <strong>¿Primera vez?</strong> Este botón crea automáticamente:
+                            </p>
+                            <ul style="margin: 5px 0; padding-left: 20px; line-height: 1.6; color: #6A1B9A;">
+                                <li>9 categorías estándar (Pre-Infantil A, B, Infantil A, B, Juvenil A, B, C, Mayores, Máster)</li>
+                                <li>27 eventos/pruebas de natación (50m, 100m, 200m en todos los estilos)</li>
+                            </ul>
+                            <p style="margin: 5px 0; color: #D32F2F; font-weight: bold;">⚠️ Solo úsalo una vez al inicio!</p>
+                        </div>
+
+                        <!-- Generar Datos -->
+                        <div style="background: linear-gradient(135deg, #F3E5F5, #E1BEE7); padding: 15px; border-radius: 8px; border-left: 5px solid #9C27B0;">
+                            <button onclick="generateTestData()" style="width: 100%; background: #9C27B0; color: white; font-weight: bold; font-size: 1.05em; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 3px 10px rgba(156,39,176,0.3); margin-bottom: 10px;">
+                                🎲 Generar Datos Completos
+                            </button>
+                            <p style="margin: 5px 0; line-height: 1.6; color: #4A148C;">
+                                <strong>Para pruebas:</strong> Genera datos de ejemplo completos incluyendo:
+                            </p>
+                            <ul style="margin: 5px 0; padding-left: 20px; line-height: 1.6; color: #6A1B9A;">
+                                <li>96 participantes de muestra con nombres realistas</li>
+                                <li>Inscripciones automáticas en las pruebas</li>
+                                <li>Resultados simulados para hacer pruebas</li>
+                            </ul>
+                            <p style="margin: 5px 0; color: #FF6F00; font-weight: bold;">💡 Útil para probar el sistema antes del evento real</p>
+                        </div>
+
+                        <!-- Limpiar Todo -->
+                        <div style="background: linear-gradient(135deg, #FFEBEE, #FFCDD2); padding: 15px; border-radius: 8px; border-left: 5px solid #D32F2F;">
+                            <button onclick="clearAllData()" style="width: 100%; background: #D32F2F; color: white; font-weight: bold; font-size: 1.05em; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 3px 10px rgba(211,47,47,0.3); margin-bottom: 10px;">
+                                🗑️ Limpiar Todo
+                            </button>
+                            <p style="margin: 5px 0; line-height: 1.6; color: #B71C1C;">
+                                <strong>¡PELIGRO!</strong> Elimina TODA la información:
+                            </p>
+                            <ul style="margin: 5px 0; padding-left: 20px; line-height: 1.6; color: #C62828;">
+                                <li>Todas las categorías</li>
+                                <li>Todos los eventos/pruebas</li>
+                                <li>Todos los participantes</li>
+                                <li>Todas las inscripciones y resultados</li>
+                            </ul>
+                            <p style="margin: 5px 0; color: #D32F2F; font-weight: bold;">⚠️ ESTA ACCIÓN NO SE PUEDE DESHACER - Úsalo solo si quieres empezar de cero</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+                    <!-- Categorías -->
+                    <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #2196F3;">
+                        <h3 style="color: #1976D2; margin-top: 0;">📋 1. Categorías</h3>
+                        <p style="margin: 10px 0; line-height: 1.6;">Define los grupos de edad de los nadadores (Ej: Sub-10, Sub-12, Juvenil, etc.)</p>
+                        <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
+                            <li><strong>➕ Agregar Categoría:</strong> Crea una nueva categoría</li>
+                            <li><strong>✏️ Editar:</strong> Modifica el nombre de una categoría</li>
+                            <li><strong>🗑️ Eliminar:</strong> Borra una categoría (cuidado!)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Pruebas -->
+                    <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #FF9800;">
+                        <h3 style="color: #F57C00; margin-top: 0;">🏁 2. Eventos/Pruebas</h3>
+                        <p style="margin: 10px 0; line-height: 1.6;">Configura las competencias (Ej: 50m Libre, 100m Espalda, Relevo 4x50, etc.)</p>
+                        <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
+                            <li><strong>➕ Agregar Evento:</strong> Crea una nueva prueba y asígnala a una categoría</li>
+                            <li><strong>🔍 Buscar:</strong> Filtra pruebas por nombre</li>
+                            <li><strong>✏️ Editar:</strong> Cambia el nombre o categoría</li>
+                        </ul>
+                    </div>
+
+                    <!-- Participantes -->
+                    <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #9C27B0;">
+                        <h3 style="color: #7B1FA2; margin-top: 0;">👤 3. Participantes</h3>
+                        <p style="margin: 10px 0; line-height: 1.6;">Registra todos los nadadores que competirán (nombre, club, género)</p>
+                        <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
+                            <li><strong>➕ Agregar Participante:</strong> Registra un nuevo nadador</li>
+                            <li><strong>🔍 Buscar:</strong> Encuentra por nombre o club (sin tildes!)</li>
+                            <li><strong>✏️ Editar:</strong> Actualiza datos del nadador</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="background: #E3F2FD; padding: 15px; border-radius: 8px; margin-top: 15px; border: 2px solid #2196F3;">
+                    <h3 style="color: #1565C0; margin-top: 0;">📝 Orden Recomendado</h3>
+                    <ol style="margin: 10px 0; padding-left: 20px; line-height: 1.8; font-size: 1.05em;">
+                        <li><strong>Paso 1:</strong> Crea las Categorías (o usa configuración automática)</li>
+                        <li><strong>Paso 2:</strong> Agrega los Eventos/Pruebas para cada categoría</li>
+                        <li><strong>Paso 3:</strong> Registra a todos los Participantes</li>
+                        <li><strong>Paso 4:</strong> Ve al <strong>🎮 Panel de Control</strong> para inscribir nadadores en las pruebas</li>
+                    </ol>
+                </div>
+
+                <div style="background: #FFEBEE; padding: 15px; border-radius: 8px; margin-top: 15px; border: 2px solid #F44336;">
+                    <h3 style="color: #C62828; margin-top: 0;">⚠️ Importante</h3>
+                    <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
+                        <li>El botón <strong>🗑️ Eliminar</strong> borra permanentemente. ¡Ten cuidado!</li>
+                        <li>Puedes buscar sin tildes: "nicolas" encontrará "Nicolás"</li>
+                        <li>Si hay más de 10 registros, usa el botón <strong>"📋 Ver todos"</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2>📋 Categorías</h2>
+                <div class="card-actions">
+                    <button onclick="showCategoryModal()" class="btn btn-primary btn-sm">
+                        ➕ Agregar Categoría
+                    </button>
+                </div>
+            </div>
+            <div id="categoriesList" class="table-container">
+                <table id="categoriesTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre de Categoría</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoriesBody">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+                <div id="categoriesViewMore" style="text-align: center; margin-top: 15px; display: none;">
+                    <button onclick="toggleViewCategories()" class="btn btn-secondary btn-sm" id="categoriesToggleBtn">
+                        📋 Ver todos
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2>🏁 Eventos/Pruebas</h2>
+                <div class="card-actions">
+                    <button onclick="showEventModal()" class="btn btn-primary btn-sm">
+                        ➕ Agregar Evento
+                    </button>
+                </div>
+            </div>
+            <div style="padding: 15px; background: #f5f5f5; border-bottom: 1px solid #ddd;">
+                <input type="text" id="searchEvents" placeholder="🔍 Buscar por nombre de prueba..." 
+                       style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"
+                       oninput="filterEvents()">
+            </div>
+            <div class="table-container">
+                <table id="eventsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre del Evento</th>
+                            <th>Categoría</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eventsBody">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+                <div id="eventsViewMore" style="text-align: center; margin-top: 15px; display: none;">
+                    <button onclick="toggleViewEvents()" class="btn btn-secondary btn-sm" id="eventsToggleBtn">
+                        📋 Ver todos
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Participants Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2>👤 Participantes</h2>
+                <div class="card-actions">
+                    <button onclick="showParticipantModal()" class="btn btn-primary btn-sm">
+                        ➕ Agregar Participante
+                    </button>
+                </div>
+            </div>
+            <div style="padding: 15px; background: #f5f5f5; border-bottom: 1px solid #ddd;">
+                <input type="text" id="searchParticipants" placeholder="🔍 Buscar por nombre o club..." 
+                       style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"
+                       oninput="filterParticipants()">
+            </div>
+            <div class="table-container">
+                <table id="participantsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Club/Equipo</th>
+                            <th>Género</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="participantsBody">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+                <div id="participantsViewMore" style="text-align: center; margin-top: 15px; display: none;">
+                    <button onclick="toggleViewParticipants()" class="btn btn-secondary btn-sm" id="participantsToggleBtn">
+                        📋 Ver todos (<span id="participantsHiddenCount">0</span> ocultos)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="background: linear-gradient(135deg, #2E7D32, #1B5E20); color: white; padding: 30px 20px; margin-top: 40px; text-align: center;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <h3 style="margin: 0 0 10px 0; font-size: 1.5em;">🏊 Olimpiadas Río de Oro 2025</h3>
+            <p style="margin: 5px 0; opacity: 0.9;">Sistema de Gestión de Competencias de Natación</p>
+            <p style="margin: 5px 0; opacity: 0.8; font-size: 0.9em;">📅 2 de Noviembre, 2025 | 👥 96 Participantes | 🏆 9 Categorías</p>
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.3);">
+                <p style="margin: 0; font-size: 0.85em; opacity: 0.7;">Desarrollado con ❤️ para la comunidad deportiva</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal: Category -->
+    <div id="categoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Agregar Categoría</h2>
+                <button class="modal-close" onclick="closeCategoryModal()">✕</button>
+            </div>
+            <form onsubmit="saveCategory(event)">
+                <div class="form-group">
+                    <label>Nombre de la Categoría *</label>
+                    <input type="text" id="categoryName" required placeholder="Ej: Infantil A">
+                </div>
+                <div class="flex gap-10">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeCategoryModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Event -->
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Agregar Evento</h2>
+                <button class="modal-close" onclick="closeEventModal()">✕</button>
+            </div>
+            <form onsubmit="saveEvent(event)">
+                <div class="form-group">
+                    <label>Nombre del Evento *</label>
+                    <input type="text" id="eventName" required placeholder="Ej: 25M Crol o Libre">
+                </div>
+                <div class="form-group">
+                    <label>Categoría *</label>
+                    <select id="eventCategory" required>
+                        <option value="">Selecciona una categoría</option>
+                    </select>
+                </div>
+                <div class="flex gap-10">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEventModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Participant -->
+    <div id="participantModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Agregar Participante</h2>
+                <button class="modal-close" onclick="closeParticipantModal()">✕</button>
+            </div>
+            <form onsubmit="saveParticipant(event)">
+                <div class="form-group">
+                    <label>Nombre Completo *</label>
+                    <input type="text" id="participantName" required placeholder="Ej: Juan Pérez">
+                </div>
+                <div class="form-group">
+                    <label>Club o Equipo</label>
+                    <input type="text" id="participantClub" placeholder="Ej: Club Neptuno">
+                </div>
+                <div class="form-group">
+                    <label>Género</label>
+                    <select id="participantGender">
+                        <option value="">Seleccionar</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                    </select>
+                </div>
+                <div class="flex gap-10">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeParticipantModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/database.js"></script>
+    <script src="js/event-data.js"></script>
+    <script src="js/sportland-participants-importer.js"></script>
+    <script src="js/setup-complete-event.js"></script>
+    <script src="js/clean-duplicates.js"></script>
+    <script src="js/test-data-generator.js"></script>
+    <script src="js/export.js"></script>
+    <script>
+        // Variables para control de vista
+        let showAllCategories = false;
+        let showAllEvents = false;
+        let showAllParticipants = false;
+        const MAX_VISIBLE_ROWS = 10;
+
+        // Función para normalizar texto (quitar tildes)
+        function normalizeText(text) {
+            if (!text) return '';
+            return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        }
+
+        // Función para mostrar/ocultar panel de ayuda
+        function toggleHelpPanel() {
+            const content = document.getElementById('helpPanelContent');
+            const toggle = document.getElementById('helpPanelToggle');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                toggle.style.transform = 'rotate(0deg)';
+                toggle.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                toggle.style.transform = 'rotate(-90deg)';
+                toggle.textContent = '▶';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllData();
+        });
+
+        // Load all tables
+        function loadAllData() {
+            loadCategories();
+            loadEvents();
+            loadParticipants();
+        }
+
+        // ==================== CATEGORIES ====================
+        
+        function loadCategories() {
+            const categories = db.getCategories();
+            const tbody = document.getElementById('categoriesBody');
+            const viewMoreDiv = document.getElementById('categoriesViewMore');
+            const toggleBtn = document.getElementById('categoriesToggleBtn');
+            
+            if (categories.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center" style="padding: 40px;">No hay categorías. Agrega la primera categoría.</td></tr>';
+                viewMoreDiv.style.display = 'none';
+                return;
+            }
+
+            const displayCategories = showAllCategories ? categories : categories.slice(0, MAX_VISIBLE_ROWS);
+            
+            tbody.innerHTML = displayCategories.map(cat => `
+                <tr>
+                    <td>${cat.category_id}</td>
+                    <td>${cat.category_name}</td>
+                    <td class="table-actions">
+                        <button onclick="editCategory('${cat.category_id}', '${cat.category_name.replace(/'/g, "\\'")}')" class="btn btn-primary btn-sm">
+                            ✏️ Editar
+                        </button>
+                        <button onclick="deleteCategory('${cat.category_id}')" class="btn btn-danger btn-sm">
+                            🗑️ Eliminar
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Mostrar/ocultar botón "Ver todos"
+            if (categories.length > MAX_VISIBLE_ROWS) {
+                viewMoreDiv.style.display = 'block';
+                toggleBtn.textContent = showAllCategories ? '📋 Ver menos' : `📋 Ver todos (${categories.length - MAX_VISIBLE_ROWS} ocultos)`;
+            } else {
+                viewMoreDiv.style.display = 'none';
+            }
+        }
+
+        function toggleViewCategories() {
+            showAllCategories = !showAllCategories;
+            loadCategories();
+        }
+
+        function showCategoryModal() {
+            document.getElementById('categoryModal').classList.add('active');
+            document.getElementById('categoryName').value = '';
+            document.getElementById('categoryName').removeAttribute('data-edit-id');
+        }
+
+        function closeCategoryModal() {
+            document.getElementById('categoryModal').classList.remove('active');
+        }
+
+        function saveCategory(event) {
+            event.preventDefault();
+            const name = document.getElementById('categoryName').value;
+            const editId = document.getElementById('categoryName').getAttribute('data-edit-id');
+            
+            if (editId) {
+                // Editar categoría existente
+                db.updateCategory(editId, name);
+                alert('✅ Categoría actualizada correctamente');
+            } else {
+                // Agregar nueva categoría
+                db.addCategory(name);
+                alert('✅ Categoría agregada correctamente');
+            }
+            
+            closeCategoryModal();
+            loadAllData();
+        }
+
+        function editCategory(id, currentName) {
+            document.getElementById('categoryModal').classList.add('active');
+            document.getElementById('categoryName').value = currentName;
+            document.getElementById('categoryName').setAttribute('data-edit-id', id);
+        }
+
+        function deleteCategory(id) {
+            if (confirm('¿Eliminar esta categoría?')) {
+                db.deleteCategory(id);
+                loadAllData();
+            }
+        }
+
+        // ==================== EVENTS ====================
+        
+        function loadEvents() {
+            const events = db.getEvents();
+            const categories = db.getCategories();
+            const tbody = document.getElementById('eventsBody');
+            const viewMoreDiv = document.getElementById('eventsViewMore');
+            const toggleBtn = document.getElementById('eventsToggleBtn');
+            
+            if (events.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center" style="padding: 40px;">No hay eventos. Agrega el primer evento.</td></tr>';
+                viewMoreDiv.style.display = 'none';
+                return;
+            }
+
+            const displayEvents = showAllEvents ? events : events.slice(0, MAX_VISIBLE_ROWS);
+
+            tbody.innerHTML = displayEvents.map(evt => {
+                const category = categories.find(c => c.category_id === evt.category_id);
+                return `
+                    <tr>
+                        <td>${evt.event_id}</td>
+                        <td>${evt.event_name}</td>
+                        <td>${category ? category.category_name : 'N/A'}</td>
+                        <td class="table-actions">
+                            <button onclick="editEvent('${evt.event_id}', '${evt.event_name.replace(/'/g, "\\'")}', '${evt.category_id}')" class="btn btn-primary btn-sm">
+                                ✏️ Editar
+                            </button>
+                            <button onclick="deleteEvent('${evt.event_id}')" class="btn btn-danger btn-sm">
+                                🗑️ Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Mostrar/ocultar botón "Ver todos"
+            if (events.length > MAX_VISIBLE_ROWS) {
+                viewMoreDiv.style.display = 'block';
+                toggleBtn.textContent = showAllEvents ? '📋 Ver menos' : `📋 Ver todos (${events.length - MAX_VISIBLE_ROWS} ocultos)`;
+            } else {
+                viewMoreDiv.style.display = 'none';
+            }
+        }
+
+        function toggleViewEvents() {
+            showAllEvents = !showAllEvents;
+            loadEvents();
+        }
+
+        function filterEvents() {
+            const searchTerm = normalizeText(document.getElementById('searchEvents').value.trim());
+            
+            // Si no hay búsqueda, mostrar todos normalmente
+            if (!searchTerm) {
+                loadEvents();
+                return;
+            }
+            
+            const events = db.getEvents();
+            const categories = db.getCategories();
+            const tbody = document.getElementById('eventsBody');
+            const viewMoreDiv = document.getElementById('eventsViewMore');
+            
+            const filtered = events.filter(e => 
+                e.event_name && normalizeText(e.event_name).includes(searchTerm)
+            );
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center" style="padding: 40px;">No se encontraron pruebas que coincidan con la búsqueda.</td></tr>';
+                viewMoreDiv.style.display = 'none';
+                return;
+            }
+
+            const displayEvents = showAllEvents ? filtered : filtered.slice(0, MAX_VISIBLE_ROWS);
+            
+            tbody.innerHTML = displayEvents.map(evt => {
+                const category = categories.find(c => c.category_id === evt.category_id);
+                return `
+                    <tr>
+                        <td>${evt.event_id}</td>
+                        <td>${evt.event_name}</td>
+                        <td>${category ? category.category_name : 'N/A'}</td>
+                        <td class="table-actions">
+                            <button onclick="editEvent('${evt.event_id}', '${evt.event_name.replace(/'/g, "\\'")}', '${evt.category_id}')" class="btn btn-primary btn-sm">
+                                ✏️ Editar
+                            </button>
+                            <button onclick="deleteEvent('${evt.event_id}')" class="btn btn-danger btn-sm">
+                                🗑️ Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            if (filtered.length > MAX_VISIBLE_ROWS) {
+                viewMoreDiv.style.display = 'block';
+                const toggleBtn = document.getElementById('eventsToggleBtn');
+                toggleBtn.textContent = showAllEvents ? '📋 Ver menos' : `📋 Ver todos (${filtered.length - MAX_VISIBLE_ROWS} ocultos)`;
+            } else {
+                viewMoreDiv.style.display = 'none';
+            }
+        }
+
+        function showEventModal() {
+            const categories = db.getCategories();
+            if (categories.length === 0) {
+                alert('⚠️ Primero debes crear al menos una categoría');
+                return;
+            }
+
+            const select = document.getElementById('eventCategory');
+            select.innerHTML = '<option value="">Selecciona una categoría</option>' +
+                categories.map(cat => `<option value="${cat.category_id}">${cat.category_name}</option>`).join('');
+            
+            document.getElementById('eventModal').classList.add('active');
+            document.getElementById('eventName').value = '';
+            document.getElementById('eventName').removeAttribute('data-edit-id');
+        }
+
+        function closeEventModal() {
+            document.getElementById('eventModal').classList.remove('active');
+        }
+
+        function saveEvent(event) {
+            event.preventDefault();
+            const name = document.getElementById('eventName').value;
+            const categoryId = document.getElementById('eventCategory').value;
+            const editId = document.getElementById('eventName').getAttribute('data-edit-id');
+            
+            if (editId) {
+                // Editar evento existente
+                db.updateEvent(editId, name, categoryId);
+                alert('✅ Evento actualizado correctamente');
+            } else {
+                // Agregar nuevo evento
+                db.addEvent(name, categoryId);
+                alert('✅ Evento agregado correctamente');
+            }
+            
+            closeEventModal();
+            loadAllData();
+        }
+
+        function editEvent(id, currentName, currentCategoryId) {
+            const categories = db.getCategories();
+            const select = document.getElementById('eventCategory');
+            select.innerHTML = '<option value="">Selecciona una categoría</option>' +
+                categories.map(cat => `<option value="${cat.category_id}">${cat.category_name}</option>`).join('');
+            
+            document.getElementById('eventModal').classList.add('active');
+            document.getElementById('eventName').value = currentName;
+            document.getElementById('eventCategory').value = currentCategoryId;
+            document.getElementById('eventName').setAttribute('data-edit-id', id);
+        }
+
+        function deleteEvent(id) {
+            if (confirm('¿Eliminar este evento?')) {
+                db.deleteEvent(id);
+                loadAllData();
+            }
+        }
+
+        // ==================== PARTICIPANTS ====================
+        
+        function loadParticipants() {
+            const participants = db.getParticipants();
+            const tbody = document.getElementById('participantsBody');
+            const viewMoreDiv = document.getElementById('participantsViewMore');
+            const toggleBtn = document.getElementById('participantsToggleBtn');
+            const hiddenCount = document.getElementById('participantsHiddenCount');
+            
+            if (participants.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 40px;">No hay participantes. Agrega el primer participante.</td></tr>';
+                viewMoreDiv.style.display = 'none';
+                return;
+            }
+
+            const displayParticipants = showAllParticipants ? participants : participants.slice(0, MAX_VISIBLE_ROWS);
+
+            tbody.innerHTML = displayParticipants.map(p => `
+                <tr>
+                    <td>${p.participant_id}</td>
+                    <td>${p.name}</td>
+                    <td>${p.club_or_team || '-'}</td>
+                    <td>${p.gender || '-'}</td>
+                    <td class="table-actions">
+                        <button onclick="editParticipant('${p.participant_id}', '${p.name.replace(/'/g, "\\'")}', '${p.club_or_team || ''}', '${p.gender || ''}')" class="btn btn-primary btn-sm">
+                            ✏️ Editar
+                        </button>
+                        <button onclick="deleteParticipant('${p.participant_id}')" class="btn btn-danger btn-sm">
+                            🗑️ Eliminar
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Mostrar/ocultar botón "Ver todos"
+            if (participants.length > MAX_VISIBLE_ROWS) {
+                viewMoreDiv.style.display = 'block';
+                const hidden = participants.length - MAX_VISIBLE_ROWS;
+                hiddenCount.textContent = hidden;
+                toggleBtn.innerHTML = showAllParticipants 
+                    ? '📋 Ver menos' 
+                    : `📋 Ver todos (<span id="participantsHiddenCount">${hidden}</span> ocultos)`;
+            } else {
+                viewMoreDiv.style.display = 'none';
+            }
+        }
+
+        function toggleViewParticipants() {
+            showAllParticipants = !showAllParticipants;
+            loadParticipants();
+        }
+
+        function filterParticipants() {
+            const searchTerm = normalizeText(document.getElementById('searchParticipants').value.trim());
+            
+            // Si no hay búsqueda, mostrar todos normalmente
+            if (!searchTerm) {
+                loadParticipants();
+                return;
+            }
+            
+            const participants = db.getParticipants();
+            const tbody = document.getElementById('participantsBody');
+            const viewMoreDiv = document.getElementById('participantsViewMore');
+            
+            const filtered = participants.filter(p => 
+                (p.name && normalizeText(p.name).includes(searchTerm)) ||
+                (p.club_or_team && normalizeText(p.club_or_team).includes(searchTerm))
+            );
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 40px;">No se encontraron participantes que coincidan con la búsqueda.</td></tr>';
+                viewMoreDiv.style.display = 'none';
+                return;
+            }
+
+            const displayParticipants = showAllParticipants ? filtered : filtered.slice(0, MAX_VISIBLE_ROWS);
+            
+            tbody.innerHTML = displayParticipants.map(p => `
+                <tr>
+                    <td>${p.participant_id}</td>
+                    <td>${p.name || ''}</td>
+                    <td>${p.club_or_team || '-'}</td>
+                    <td>${p.gender || '-'}</td>
+                    <td class="table-actions">
+                        <button onclick="editParticipant('${p.participant_id}', '${(p.name || '').replace(/'/g, "\\'")}', '${p.club_or_team || ''}', '${p.gender || ''}')" class="btn btn-primary btn-sm">
+                            ✏️ Editar
+                        </button>
+                        <button onclick="deleteParticipant('${p.participant_id}')" class="btn btn-danger btn-sm">
+                            🗑️ Eliminar
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            if (filtered.length > MAX_VISIBLE_ROWS) {
+                const hidden = filtered.length - MAX_VISIBLE_ROWS;
+                viewMoreDiv.style.display = 'block';
+                const toggleBtn = document.getElementById('participantsToggleBtn');
+                toggleBtn.innerHTML = showAllParticipants 
+                    ? '📋 Ver menos' 
+                    : `📋 Ver todos (<span id="participantsHiddenCount">${hidden}</span> ocultos)`;
+            } else {
+                viewMoreDiv.style.display = 'none';
+            }
+        }
+
+        function showParticipantModal() {
+            document.getElementById('participantModal').classList.add('active');
+            document.getElementById('participantName').value = '';
+            document.getElementById('participantClub').value = '';
+            document.getElementById('participantGender').value = '';
+            document.getElementById('participantName').removeAttribute('data-edit-id');
+        }
+
+        function closeParticipantModal() {
+            document.getElementById('participantModal').classList.remove('active');
+        }
+
+        function saveParticipant(event) {
+            event.preventDefault();
+            const name = document.getElementById('participantName').value;
+            const club = document.getElementById('participantClub').value;
+            const gender = document.getElementById('participantGender').value;
+            const editId = document.getElementById('participantName').getAttribute('data-edit-id');
+            
+            if (editId) {
+                // Editar participante existente
+                db.updateParticipant(editId, name, club, gender);
+                alert('✅ Participante actualizado correctamente');
+            } else {
+                // Agregar nuevo participante
+                db.addParticipant(name, club, gender);
+                alert('✅ Participante agregado correctamente');
+            }
+            
+            closeParticipantModal();
+            loadAllData();
+        }
+
+        function editParticipant(id, currentName, currentClub, currentGender) {
+            document.getElementById('participantModal').classList.add('active');
+            document.getElementById('participantName').value = currentName;
+            document.getElementById('participantClub').value = currentClub;
+            document.getElementById('participantGender').value = currentGender;
+            document.getElementById('participantName').setAttribute('data-edit-id', id);
+        }
+
+        function deleteParticipant(id) {
+            if (confirm('¿Eliminar este participante?')) {
+                db.deleteParticipant(id);
+                loadAllData();
+            }
+        }
+
+        // ==================== UTILITIES ====================
+        
+        function clearAllData() {
+            if (db.clearAllData()) {
+                loadAllData();
+                alert('✅ Todos los datos han sido eliminados');
+            }
+        }
+    </script>
+</body>
+</html>
