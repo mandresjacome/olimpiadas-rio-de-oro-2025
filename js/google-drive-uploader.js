@@ -51,8 +51,8 @@ async function getAccessToken() {
  * Esta es la solución más práctica desde el navegador
  */
 async function subirPDFconAppsScript(pdfBlob, nombreArchivo) {
-    // URL del Apps Script que crearemos
-    const APPS_SCRIPT_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI';
+    // URL del Apps Script configurado
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyd5W_P_4oGC-GQ-WH5hpQ3MGy-uX6EpSf1VbFww1zZyK7EU190umynHktfnivKM6c2/exec';
     
     try {
         console.log(`📤 Subiendo ${nombreArchivo} a Google Drive...`);
@@ -110,116 +110,236 @@ async function generarYSubirPDFResultados(eventId, eventName, categoryName) {
         // Configurar fuente y colores
         doc.setFont('helvetica');
         
-        // === ENCABEZADO ===
+        // === ENCABEZADO MEJORADO ===
+        // Fondo del encabezado
+        doc.setFillColor(41, 128, 185); // Azul
+        doc.rect(0, 0, 210, 35, 'F');
+        
         // Título principal
-        doc.setFontSize(24);
-        doc.setTextColor(41, 128, 185); // Azul
-        doc.text('🏊 OLIMPIADAS RÍO DE ORO 2025', 105, 20, { align: 'center' });
+        doc.setFontSize(22);
+        doc.setTextColor(255, 255, 255); // Blanco
+        doc.setFont('helvetica', 'bold');
+        doc.text('OLIMPIADAS RÍO DE ORO', 105, 12, { align: 'center' });
         
-        // Línea decorativa
-        doc.setDrawColor(41, 128, 185);
-        doc.setLineWidth(1);
-        doc.line(20, 25, 190, 25);
-        
-        // Categoría y evento
+        // Categoría
         doc.setFontSize(16);
-        doc.setTextColor(0, 0, 0);
-        doc.text(categoryName, 105, 35, { align: 'center' });
+        doc.setFont('helvetica', 'normal');
+        doc.text(categoryName, 105, 20, { align: 'center' });
         
+        // Evento
         doc.setFontSize(14);
-        doc.setTextColor(100, 100, 100);
-        doc.text(eventName, 105, 42, { align: 'center' });
+        doc.text(eventName, 105, 27, { align: 'center' });
         
-        // Fecha
-        doc.setFontSize(10);
+        // Fecha en pequeño
+        doc.setFontSize(9);
         const fecha = new Date().toLocaleDateString('es-CO', { 
             year: 'numeric', 
             month: 'long', 
             day: 'numeric' 
         });
-        doc.text(`Fecha: ${fecha}`, 105, 48, { align: 'center' });
+        doc.text(`Fecha: ${fecha}`, 105, 32, { align: 'center' });
         
         // === OBTENER RESULTADOS ===
         const db = window.db || window;
-        const entries = db.getEntriesByEvent ? db.getEntriesByEvent(eventId) : [];
         
-        // Filtrar solo los que tienen tiempo
-        const withTimes = entries.filter(e => e.time && e.time !== null);
+        // Obtener entries directamente de localStorage (fix para cuando db.getEntries() falla)
+        let entries = [];
+        try {
+            const entriesData = localStorage.getItem('entries');
+            if (entriesData) {
+                entries = JSON.parse(entriesData);
+            }
+        } catch (e) {
+            console.error('Error parsing entries:', e);
+            entries = db.getEntries ? db.getEntries() : [];
+        }
+        
+        console.log('📊 PDF Debug:');
+        console.log('- Event ID buscado:', eventId);
+        console.log('- Total entries en sistema:', entries.length);
+        
+        const eventEntries = entries.filter(e => e.event_id === eventId);
+        console.log('- Entries encontradas para', eventId, ':', eventEntries.length);
+        
+        // Procesar entries y obtener tiempos (desde entry o desde results)
+        const resultsData = [];
+        eventEntries.forEach(entry => {
+            let time = entry.time || null;
+            let status = entry.status || 'OK';
+            
+            // Si no hay tiempo en entry, buscar en results
+            if (!time && db.getResultByEntryId) {
+                const result = db.getResultByEntryId(entry.entry_id);
+                if (result) {
+                    time = result.time_seconds;
+                    status = result.status || status;
+                }
+            }
+            
+            console.log('  Entry:', entry.entry_id, '- Time:', time, '- Status:', status);
+            
+            // Solo agregar si tiene tiempo y estado OK
+            if (time && status === 'OK') {
+                resultsData.push({
+                    ...entry,
+                    time: time,
+                    status: status
+                });
+            }
+        });
+        
+        console.log('- Results with times:', resultsData.length);
         
         // Ordenar por tiempo
-        withTimes.sort((a, b) => {
-            const timeA = a.time.split(':').reduce((acc, time) => (60 * acc) + +time, 0);
-            const timeB = b.time.split(':').reduce((acc, time) => (60 * acc) + +time, 0);
+        resultsData.sort((a, b) => {
+            const timeA = typeof a.time === 'string' ? 
+                a.time.split(':').reduce((acc, time) => (60 * acc) + +time, 0) : 
+                parseFloat(a.time);
+            const timeB = typeof b.time === 'string' ? 
+                b.time.split(':').reduce((acc, time) => (60 * acc) + +time, 0) : 
+                parseFloat(b.time);
             return timeA - timeB;
         });
         
-        // === TABLA DE RESULTADOS ===
-        let y = 60;
+        let y = 42;
+        
+        // Obtener participantes de localStorage también
+        let participants = [];
+        try {
+            const participantsData = localStorage.getItem('participants');
+            if (participantsData) {
+                participants = JSON.parse(participantsData);
+            }
+        } catch (e) {
+            console.error('Error parsing participants:', e);
+        }
+        
+        // === SECCIÓN PODIO (TOP 3) ===
+        if (resultsData.length > 0) {
+            doc.setFontSize(14);
+            doc.setTextColor(46, 125, 50); // Verde
+            doc.setFont('helvetica', 'bold');
+            doc.text('PODIO', 20, y);
+            doc.setFont('helvetica', 'normal');
+            y += 8;
+            
+            const top3 = resultsData.slice(0, 3);
+            
+            top3.forEach((entry, index) => {
+                const participant = participants.find(p => p.participant_id === entry.participant_id);
+                const posicion = index + 1;
+                
+                // Formatear tiempo
+                let timeDisplay = entry.time;
+                if (typeof entry.time === 'number') {
+                    const mins = Math.floor(entry.time / 60);
+                    const secs = (entry.time % 60).toFixed(2);
+                    timeDisplay = mins > 0 ? `${mins}:${secs.padStart(5, '0')}` : `${secs}s`;
+                }
+                
+                // Colores según posición
+                let bgColor, medalText;
+                if (posicion === 1) {
+                    bgColor = [255, 215, 0]; // Dorado
+                    medalText = '[ORO]';
+                } else if (posicion === 2) {
+                    bgColor = [192, 192, 192]; // Plateado
+                    medalText = '[PLATA]';
+                } else {
+                    bgColor = [205, 127, 50]; // Bronce
+                    medalText = '[BRONCE]';
+                }
+                
+                // Caja de color
+                doc.setFillColor(...bgColor);
+                doc.roundedRect(20, y - 5, 170, 12, 2, 2, 'F');
+                
+                // Texto
+                doc.setTextColor(0, 0, 0);
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`${medalText} ${posicion} Lugar: ${participant?.name || participant?.participant_name || 'Desconocido'}`, 25, y + 2);
+                
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(10);
+                doc.text(`${timeDisplay} • ${participant?.club || '-'}`, 25, y + 7);
+                
+                y += 15;
+            });
+            
+            y += 5;
+        }
+        
+        // === TABLA COMPLETA DE RESULTADOS ===
+        doc.setFontSize(14);
+        doc.setTextColor(46, 125, 50);
+        doc.setFont('helvetica', 'bold');
+        doc.text('TABLA DE RESULTADOS COMPLETA', 20, y);
+        doc.setFont('helvetica', 'normal');
+        y += 8;
         
         // Encabezados de tabla
-        doc.setFillColor(41, 128, 185);
+        doc.setFillColor(46, 125, 50); // Verde
         doc.rect(20, y, 170, 10, 'F');
         
         doc.setTextColor(255, 255, 255);
-        doc.setFontSize(11);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
         doc.text('Pos', 25, y + 7);
         doc.text('Participante', 45, y + 7);
         doc.text('Club', 110, y + 7);
         doc.text('Heat', 145, y + 7);
         doc.text('Carril', 160, y + 7);
         doc.text('Tiempo', 175, y + 7);
+        doc.setFont('helvetica', 'normal');
         
         y += 12;
         
         // Datos
         doc.setTextColor(0, 0, 0);
-        doc.setFontSize(10);
+        doc.setFontSize(9);
         
-        withTimes.forEach((entry, index) => {
+        resultsData.forEach((entry, index) => {
             const posicion = index + 1;
-            const participant = db.getParticipantById ? db.getParticipantById(entry.participant_id) : null;
+            const participant = participants.find(p => p.participant_id === entry.participant_id);
             
             // Color de fondo alternado
             if (index % 2 === 0) {
                 doc.setFillColor(245, 245, 245);
-                doc.rect(20, y - 5, 170, 8, 'F');
-            }
-            
-            // Medalla para top 3
-            let medalla = '';
-            let color = [0, 0, 0];
-            if (posicion === 1) {
-                medalla = '🥇';
-                color = [255, 215, 0]; // Dorado
-            } else if (posicion === 2) {
-                medalla = '🥈';
-                color = [192, 192, 192]; // Plateado
-            } else if (posicion === 3) {
-                medalla = '🥉';
-                color = [205, 127, 50]; // Bronce
+                doc.rect(20, y - 4, 170, 7, 'F');
             }
             
             // Posición
-            doc.setTextColor(...color);
-            doc.setFontSize(11);
-            doc.text(`${medalla} ${posicion}°`, 23, y);
+            doc.setTextColor(0, 0, 0);
+            doc.text(String(posicion), 25, y);
             
             // Datos
-            doc.setTextColor(0, 0, 0);
-            doc.setFontSize(9);
-            doc.text(participant?.name || 'Desconocido', 45, y);
+            doc.text(participant?.name || participant?.participant_name || 'Desconocido', 45, y);
             doc.text(participant?.club || '-', 110, y);
             doc.text(String(entry.heat || '-'), 148, y);
             doc.text(String(entry.lane || '-'), 163, y);
             
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'bold');
-            doc.text(entry.time, 175, y);
-            doc.setFont('helvetica', 'normal');
+            // Formatear tiempo
+            let timeDisplay = entry.time;
+            if (typeof entry.time === 'number') {
+                const mins = Math.floor(entry.time / 60);
+                const secs = (entry.time % 60).toFixed(2);
+                timeDisplay = mins > 0 ? `${mins}:${secs.padStart(5, '0')}` : `${secs}s`;
+            }
             
-            y += 8;
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(46, 125, 50);
+            doc.text(timeDisplay, 175, y);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(0, 0, 0);
+            
+            y += 7;
             
             // Nueva página si es necesario
+            if (y > 270) {
+                doc.addPage();
+                y = 20;
+            }
             if (y > 270) {
                 doc.addPage();
                 y = 20;
@@ -230,14 +350,28 @@ async function generarYSubirPDFResultados(eventId, eventName, categoryName) {
         const pageCount = doc.internal.getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {
             doc.setPage(i);
-            doc.setFontSize(8);
+            
+            // Línea superior del footer
+            doc.setDrawColor(46, 125, 50);
+            doc.setLineWidth(0.5);
+            doc.line(20, 280, 190, 280);
+            
+            // Título del evento
+            doc.setFontSize(9);
+            doc.setTextColor(46, 125, 50);
+            doc.setFont('helvetica', 'bold');
+            doc.text('OLIMPIADAS RIO DE ORO 2025', 105, 285, { align: 'center' });
+            
+            // Información del sistema
+            doc.setFontSize(7);
+            doc.setTextColor(100, 100, 100);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Sistema de Gestion de Competencias de Natacion', 105, 289, { align: 'center' });
+            
+            // Número de página
+            doc.setFontSize(7);
             doc.setTextColor(150, 150, 150);
-            doc.text(
-                `Página ${i} de ${pageCount} - Generado el ${fecha}`,
-                105,
-                287,
-                { align: 'center' }
-            );
+            doc.text(`Pagina ${i} de ${pageCount} - Generado el ${fecha}`, 105, 293, { align: 'center' });
         }
         
         // Generar nombre de archivo
@@ -247,17 +381,26 @@ async function generarYSubirPDFResultados(eventId, eventName, categoryName) {
         // Convertir a Blob
         const pdfBlob = doc.output('blob');
         
+        // Mostrar mensaje de progreso
+        console.log('📄 PDF generado, subiendo a Google Drive...');
+        
         // OPCIÓN 1: Descargar localmente
         doc.save(nombreArchivo);
         console.log('✅ PDF descargado localmente');
         
-        // OPCIÓN 2: Subir a Drive (requiere Apps Script configurado)
-        // await subirPDFconAppsScript(pdfBlob, nombreArchivo);
+        // OPCIÓN 2: Subir a Drive automáticamente
+        const uploadSuccess = await subirPDFconAppsScript(pdfBlob, nombreArchivo);
         
-        alert('✅ PDF generado y descargado!\n\n' +
-              'Para subirlo a Google Drive automáticamente,\n' +
-              'necesitamos configurar Google Apps Script.\n\n' +
-              'Por ahora, el PDF se descargó a tu computadora.');
+        if (uploadSuccess) {
+            alert('✅ PDF generado y subido a Google Drive!\n\n' +
+                  `📄 Archivo: ${nombreArchivo}\n` +
+                  '📁 Carpeta: Resultados Olimpiadas 2025\n\n' +
+                  '🔗 Revisa tu carpeta de Google Drive para ver el archivo.');
+        } else {
+            alert('⚠️ PDF generado y descargado localmente.\n\n' +
+                  'No se pudo subir automáticamente a Drive.\n' +
+                  'Puedes subirlo manualmente si lo necesitas.');
+        }
         
         return true;
     } catch (error) {
